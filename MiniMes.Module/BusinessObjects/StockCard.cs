@@ -15,7 +15,9 @@ using MiniMes.Module.Enums;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-    
+    [NavigationItem("Stock and Warehouse")]
+
+
     public class StockCard : BaseObject { 
         
         public StockCard(Session session)
@@ -62,6 +64,15 @@ namespace MiniMes.Module.BusinessObjects {
         public XPCollection<Routings> Routings
         {
             get { return GetCollection<Routings>(nameof(Routings)); }
+        }
+
+        [Association("StockCard-ProductionOrders")]
+        public XPCollection<ProductionOrder> ProductionOrders
+        {
+            get
+            {
+                return GetCollection<ProductionOrder>(nameof(ProductionOrders));
+            }
         }
 
 

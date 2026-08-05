@@ -14,7 +14,8 @@ using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-    
+    [NavigationItem("Production Definitions")]
+
     public class Equipments : BaseObject { 
         
         public Equipments(Session session)

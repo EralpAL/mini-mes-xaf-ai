@@ -14,7 +14,8 @@ using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-   
+    [NavigationItem("Production Definitions")]
+
     public class Routings : BaseObject { 
         public Routings(Session session)
             : base(session) {
@@ -39,8 +40,13 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(SequenceNumber), ref sequenceNumber, value); }
         }
     
-        
-
+        private Operation operation;
+        [Association("Operation-Routings")]
+        public Operation Operation
+        {
+            get { return operation; }
+            set { SetPropertyValue(nameof(Operation), ref operation, value); }
+        }
 
     }
 }

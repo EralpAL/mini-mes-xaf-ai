@@ -14,14 +14,13 @@ using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-  
+    [NavigationItem("Production Definitions")]
     public class Operation : BaseObject { 
         public Operation(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-           
         }
 
         private string operationCode;
@@ -41,7 +40,10 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref operationName, value); }
         }
 
-
-
+        [Association("Operation-Routings")]
+        public XPCollection<Routings> Routings
+        {
+            get { return GetCollection<Routings>(nameof(Routings)); }
+        }
     }
 }

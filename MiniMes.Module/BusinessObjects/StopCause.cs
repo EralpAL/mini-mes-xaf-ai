@@ -15,7 +15,8 @@ using MiniMes.Module.Enums;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-    
+    [NavigationItem("Production Definitions")]
+
     public class StopCause : BaseObject {
         public StopCause(Session session)
             : base(session) {

@@ -14,7 +14,9 @@ using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-    
+    [NavigationItem("Stock and Warehouse")]
+
+
     public class Warehouse : BaseObject { 
        
         public Warehouse(Session session)

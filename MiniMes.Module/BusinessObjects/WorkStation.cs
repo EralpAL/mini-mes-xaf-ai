@@ -14,7 +14,8 @@ using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-   
+    [NavigationItem("Production Definitions")]
+
     public class WorkStation : BaseObject { 
         public WorkStation(Session session)
             : base(session) {
@@ -60,6 +61,15 @@ namespace MiniMes.Module.BusinessObjects {
             get { return GetCollection<Equipments>(nameof(Equipments)); }
         }
 
+
+        [Association("WorkStation-Employees")]
+        public XPCollection<Employee> Employees
+        {
+            get
+            {
+                return GetCollection<Employee>(nameof(Employees));
+            }
+        }
 
     }
 }

@@ -15,7 +15,7 @@ using MiniMes.Module.Enums;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
-   
+    [NavigationItem("Personnel and Shifts")]
     public class Employee : BaseObject { 
         public Employee(Session session)
             : base(session) {
@@ -49,6 +49,38 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Role), ref role, value); }
         }
 
+        private Shift assignedShift;
+
+        [Association("Shift-Employees")]
+        public Shift AssignedShift
+        {
+            get
+            {
+                return assignedShift;
+            }
+            set
+            {
+                SetPropertyValue(nameof(AssignedShift), ref assignedShift, value);
+            }
+        }
+
+        private WorkStation workStation;
+
+        [Association("WorkStation-Employees")]
+        public WorkStation WorkStation
+        {
+            get
+            {
+                return workStation;
+            }
+            set
+            {
+                SetPropertyValue(nameof(WorkStation), ref workStation, value);
+            }
+        }
+
+
 
     }
-}
+
+    }
