@@ -10,7 +10,6 @@ using MiniMes.Module.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 
@@ -18,6 +17,8 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
+    [DefaultProperty(nameof(Code))]
+    [RuleCriteria("ProductionOrder_PlannedQuantityGreaterThanZero", DefaultContexts.Save, "PlannedQuantity > 0", CustomMessageTemplate = "Planned quantity must be greater than zero.")]
     public class ProductionOrder : BaseObject
     { 
         public ProductionOrder(Session session)
@@ -29,6 +30,22 @@ namespace MiniMes.Module.BusinessObjects
 
             base.AfterConstruction();
             Status = ProductionOrderStatus.Planned;
+        }
+
+        private string code;
+
+        [RuleRequiredField]
+        [RuleUniqueValue]
+        public string Code
+        {
+            get
+            {
+                return code;
+            }
+            set
+            {
+                SetPropertyValue(nameof(Code), ref code, value);
+            }
         }
 
         private StockCard targetStockCard;
@@ -65,6 +82,7 @@ namespace MiniMes.Module.BusinessObjects
         private decimal producedQuantity;
 
         [RuleRange(0.0, double.MaxValue)]
+        [ModelDefault("AllowEdit", "False")]
         public decimal ProducedQuantity
         {
             get
@@ -79,6 +97,7 @@ namespace MiniMes.Module.BusinessObjects
 
         private ProductionOrderStatus status;
 
+        [ModelDefault("AllowEdit", "False")]
         public ProductionOrderStatus Status
         {
             get
@@ -131,15 +150,30 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         // Recomputed deterministically from the WorkOrders collection whenever a related
-        // ProductionEntry is saved or deleted. See WorkOrder.RecalculateTotals().
+        // ProductionEntry changes. The order's produced quantity is the output of its last
+        // routing step, because every step reports the same physical items again.
+        // See WorkOrder.RecalculateTotals().
         public void RecalculateTotals()
         {
-            decimal totalProduced = 0;
+            int lastSequenceNumber = int.MinValue;
             foreach (WorkOrder workOrder in WorkOrders)
             {
-                totalProduced += workOrder.ProducedQuantity;
+                if (!workOrder.IsDeleted && workOrder.SequenceNumber > lastSequenceNumber)
+                {
+                    lastSequenceNumber = workOrder.SequenceNumber;
+                }
             }
-            ProducedQuantity = totalProduced;
+
+            decimal producedAtLastStep = 0;
+            foreach (WorkOrder workOrder in WorkOrders)
+            {
+                if (!workOrder.IsDeleted && workOrder.SequenceNumber == lastSequenceNumber)
+                {
+                    producedAtLastStep += workOrder.ProducedQuantity;
+                }
+            }
+
+            ProducedQuantity = producedAtLastStep;
         }
     }
 }

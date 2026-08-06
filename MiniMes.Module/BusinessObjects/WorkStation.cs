@@ -15,6 +15,7 @@ using DevExpress.Persistent.Validation;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
     public class WorkStation : BaseObject { 
         public WorkStation(Session session)
@@ -22,7 +23,7 @@ namespace MiniMes.Module.BusinessObjects {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-            
+            IsActive = true;
         }
 
         private string workStationCode;
@@ -57,9 +58,9 @@ namespace MiniMes.Module.BusinessObjects {
 
 
         [Association("WorkStation-Equipments")]
-        public XPCollection<Equipments> Equipments
+        public XPCollection<Equipment> Equipments
         {
-            get { return GetCollection<Equipments>(nameof(Equipments)); }
+            get { return GetCollection<Equipment>(nameof(Equipments)); }
         }
 
 

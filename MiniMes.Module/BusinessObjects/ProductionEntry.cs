@@ -16,6 +16,8 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
+    [RuleCriteria("ProductionEntry_QuantityEntered", DefaultContexts.Save, "RealizedAmount + ScrapAmount > 0", CustomMessageTemplate = "Enter a realized quantity, a scrap quantity, or both.")]
+    [RuleCriteria("ProductionEntry_ScrapReasonRequired", DefaultContexts.Save, "Not (ScrapAmount > 0 And IsNullOrEmpty(ScrapReason))", CustomMessageTemplate = "Specify a scrap reason when a scrap quantity is reported.")]
     public class ProductionEntry : BaseObject
     { 
         public ProductionEntry(Session session)
@@ -41,7 +43,20 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(nameof(WorkOrder), ref workOrder, value);
+                WorkOrder previousWorkOrder = workOrder;
+                if (!SetPropertyValue(nameof(WorkOrder), ref workOrder, value) || IsLoading || IsSaving)
+                {
+                    return;
+                }
+                if (workOrder != null && WorkStation == null)
+                {
+                    WorkStation = workOrder.AssignedWorkStation;
+                }
+                if (previousWorkOrder != null)
+                {
+                    previousWorkOrder.RecalculateTotals(this);
+                }
+                UpdateWorkOrderTotals();
             }
         }
 
@@ -87,7 +102,10 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(nameof(RealizedAmount), ref realizedAmount, value);
+                if (SetPropertyValue(nameof(RealizedAmount), ref realizedAmount, value))
+                {
+                    UpdateWorkOrderTotals();
+                }
             }
         }
 
@@ -102,7 +120,10 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(nameof(ScrapAmount), ref scrapAmount, value);
+                if (SetPropertyValue(nameof(ScrapAmount), ref scrapAmount, value))
+                {
+                    UpdateWorkOrderTotals();
+                }
             }
         }
 
@@ -149,9 +170,20 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        // Aggregation is recalculated from the complete ProductionEntries collection on every
-        // save (create or edit) and every delete, so totals stay correct and deterministic
-        // without double-counting. See WorkOrder.RecalculateTotals().
+        // The parent totals are refreshed as soon as a value changes rather than only in
+        // OnSaving, so the parent is already marked dirty when the commit starts and is written
+        // in the same transaction. OnSaving stays as a safety net for programmatic changes; it
+        // recomputes the same value and therefore does not mark anything dirty again.
+        // See WorkOrder.RecalculateTotals().
+        private void UpdateWorkOrderTotals()
+        {
+            if (IsLoading || IsSaving || IsDeleted || WorkOrder == null)
+            {
+                return;
+            }
+            WorkOrder.RecalculateTotals();
+        }
+
         protected override void OnSaving()
         {
             base.OnSaving();
@@ -163,10 +195,11 @@ namespace MiniMes.Module.BusinessObjects
 
         protected override void OnDeleting()
         {
+            WorkOrder affectedWorkOrder = WorkOrder;
             base.OnDeleting();
-            if (WorkOrder != null)
+            if (affectedWorkOrder != null)
             {
-                WorkOrder.RecalculateTotals(this);
+                affectedWorkOrder.RecalculateTotals(this);
             }
         }
     }

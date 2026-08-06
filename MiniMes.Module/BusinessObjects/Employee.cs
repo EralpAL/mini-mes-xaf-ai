@@ -16,6 +16,7 @@ using MiniMes.Module.Enums;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Personnel and Shifts")]
+    [DefaultProperty(nameof(FullName))]
     public class Employee : BaseObject { 
         public Employee(Session session)
             : base(session) {
@@ -26,24 +27,24 @@ namespace MiniMes.Module.BusinessObjects {
         }
         private string registrationNumber;
         [RuleRequiredField]
-        
+        [RuleUniqueValue]
         public string RegistrationNumber
         {
             get { return registrationNumber; }
             set { SetPropertyValue(nameof(RegistrationNumber), ref registrationNumber, value); }
         }
 
-        private string employeeName;
+        private string fullName;
         [RuleRequiredField]
-        public String Name
+        public String FullName
         {
-            get { return employeeName; }
-            set { SetPropertyValue(nameof(Name), ref employeeName, value); }
+            get { return fullName; }
+            set { SetPropertyValue(nameof(FullName), ref fullName, value); }
         }
 
 
-        private EmployeeRole role;
-        public EmployeeRole Role
+        private EnumEmployeeRole role;
+        public EnumEmployeeRole Role
         {
             get { return role; }
             set { SetPropertyValue(nameof(Role), ref role, value); }

@@ -15,6 +15,7 @@ using DevExpress.Persistent.Validation;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
     public class Routings : BaseObject {
         public Routings(Session session)

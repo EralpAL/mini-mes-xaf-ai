@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using DevExpress.Xpo;
@@ -15,15 +15,16 @@ using DevExpress.Persistent.Validation;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
-    public class Equipments : BaseObject { 
+    public class Equipment : BaseObject { 
         
-        public Equipments(Session session)
+        public Equipment(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-            
+            IsActive = true;
         }
 
         private WorkStation workStation;

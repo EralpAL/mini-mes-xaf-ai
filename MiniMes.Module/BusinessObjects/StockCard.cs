@@ -16,7 +16,7 @@ using MiniMes.Module.Enums;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Stock and Warehouse")]
-
+    [DefaultProperty(nameof(Name))]
 
     public class StockCard : BaseObject { 
         
@@ -46,8 +46,8 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref stockName, value); }
         }
 
-        private StockType stockType;
-        public StockType StockType
+        private EnumStockType stockType;
+        public EnumStockType StockType
         {
             get { return stockType; }
             set { SetPropertyValue(nameof(StockType), ref stockType, value); }

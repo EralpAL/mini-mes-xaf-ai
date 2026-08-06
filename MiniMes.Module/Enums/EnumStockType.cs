@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using DevExpress.Xpo;
@@ -13,14 +13,12 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 
 namespace MiniMes.Module.Enums {
-   
-    public enum EmployeeRole
+    public enum EnumStockType
     {
-        Operator, 
-        ShiftLeader,
-        QualityInspector,
-        MaintenanceEngineer
+        RawMaterial,
+        SemiFinished,
+        FinishedProduct,
+        Scrap,
+        SparePart
     }
-       
-    
 }

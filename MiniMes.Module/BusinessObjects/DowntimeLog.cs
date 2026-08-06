@@ -16,6 +16,7 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
+    [RuleCriteria("DowntimeLog_DurationGreaterThanZero", DefaultContexts.Save, "DurationMinutes > 0", CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
     public class DowntimeLog : BaseObject
     { 
         public DowntimeLog(Session session)
@@ -25,6 +26,21 @@ namespace MiniMes.Module.BusinessObjects
         public override void AfterConstruction()
         {
             base.AfterConstruction();
+            StartTime = DateTime.Now;
+        }
+
+        private DateTime startTime;
+
+        public DateTime StartTime
+        {
+            get
+            {
+                return startTime;
+            }
+            set
+            {
+                SetPropertyValue(nameof(StartTime), ref startTime, value);
+            }
         }
 
         private WorkStation workStation;

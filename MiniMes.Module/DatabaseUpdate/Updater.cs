@@ -10,6 +10,7 @@ using DevExpress.ExpressApp.Xpo;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
 using MiniMes.Module.BusinessObjects;
+using MiniMes.Module.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MiniMes.Module.DatabaseUpdate;
@@ -60,7 +61,177 @@ public class Updater : ModuleUpdater {
         }
 
         ObjectSpace.CommitChanges(); //This line persists created object(s).
+
+        CreateDemoData();
+        ObjectSpace.CommitChanges();
 #endif
+    }
+
+    // Master data used to demonstrate the production flow. Every item is looked up by its
+    // business code first, so running the updater again never duplicates a record and never
+    // overwrites data that was edited in the application.
+    private void CreateDemoData() {
+        Warehouse mainWarehouse = EnsureWarehouse("WH-01", "Main Warehouse");
+
+        EnsureStockCard("RM-001", "Steel Sheet 2 mm", EnumStockType.RawMaterial, mainWarehouse);
+        StockCard cutBlank = EnsureStockCard("SF-001", "Cut Blank", EnumStockType.SemiFinished, mainWarehouse);
+        StockCard bracket = EnsureStockCard("FP-001", "Steel Bracket", EnumStockType.FinishedProduct, mainWarehouse);
+
+        WorkStation cuttingStation = EnsureWorkStation("CNC-01", "CNC Cutting Machine", 320m);
+        WorkStation pressStation = EnsureWorkStation("PRS-01", "Hydraulic Press", 210m);
+        WorkStation assemblyStation = EnsureWorkStation("ASM-01", "Assembly Line", 150m);
+
+        EnsureEquipment("EQ-01", "Cutting Head", cuttingStation);
+        EnsureEquipment("EQ-02", "Bracket Mold", pressStation);
+        EnsureEquipment("EQ-03", "Torque Screwdriver", assemblyStation);
+
+        Operation cuttingOperation = EnsureOperation("OP-10", "Cutting", "Cut the raw sheet to blank size.");
+        Operation pressingOperation = EnsureOperation("OP-20", "Pressing", "Form the blank in the press.");
+        Operation assemblyOperation = EnsureOperation("OP-30", "Assembly", "Assemble and pack the bracket.");
+
+        EnsureStopCause("STP-01", "Electrical Failure", StopCategory.Unplanned);
+        EnsureStopCause("STP-02", "Material Shortage", StopCategory.Unplanned);
+        EnsureStopCause("STP-03", "Setup / Adjustment", StopCategory.Planned);
+        EnsureStopCause("STP-04", "Mold Change", StopCategory.Planned);
+
+        Shift dayShift = EnsureShift("Day Shift", new TimeSpan(8, 0, 0), new TimeSpan(16, 0, 0));
+        Shift eveningShift = EnsureShift("Evening Shift", new TimeSpan(16, 0, 0), new TimeSpan(0, 0, 0));
+
+        EnsureEmployee("1001", "Ahmet Yilmaz", EnumEmployeeRole.Operator, dayShift, cuttingStation);
+        EnsureEmployee("1002", "Elif Demir", EnumEmployeeRole.Operator, dayShift, pressStation);
+        EnsureEmployee("1003", "Mehmet Kaya", EnumEmployeeRole.ShiftLeader, eveningShift, assemblyStation);
+        EnsureEmployee("1004", "Zeynep Sahin", EnumEmployeeRole.QualityInspector, dayShift, assemblyStation);
+        EnsureEmployee("1005", "Burak Aydin", EnumEmployeeRole.MaintenanceEngineer, eveningShift, cuttingStation);
+
+        Routings bracketRouting = EnsureRouting("ROT-001", "Steel Bracket Routing");
+        Routings blankRouting = EnsureRouting("ROT-002", "Cut Blank Routing");
+
+        // Routing headers must have keys before their steps can be looked up by header code.
+        ObjectSpace.CommitChanges();
+
+        EnsureRoutingDetail(bracketRouting, 10, bracket, cuttingOperation, cuttingStation);
+        EnsureRoutingDetail(bracketRouting, 20, bracket, pressingOperation, pressStation);
+        EnsureRoutingDetail(bracketRouting, 30, bracket, assemblyOperation, assemblyStation);
+        EnsureRoutingDetail(blankRouting, 10, cutBlank, cuttingOperation, cuttingStation);
+    }
+
+    private Warehouse EnsureWarehouse(string code, string name) {
+        Warehouse warehouse = ObjectSpace.FirstOrDefault<Warehouse>(item => item.Code == code);
+        if(warehouse == null) {
+            warehouse = ObjectSpace.CreateObject<Warehouse>();
+            warehouse.Code = code;
+            warehouse.Name = name;
+        }
+        return warehouse;
+    }
+
+    private StockCard EnsureStockCard(string code, string name, EnumStockType stockType, Warehouse warehouse) {
+        StockCard stockCard = ObjectSpace.FirstOrDefault<StockCard>(item => item.Code == code);
+        if(stockCard == null) {
+            stockCard = ObjectSpace.CreateObject<StockCard>();
+            stockCard.Code = code;
+            stockCard.Name = name;
+            stockCard.StockType = stockType;
+            stockCard.Warehouse = warehouse;
+        }
+        return stockCard;
+    }
+
+    private WorkStation EnsureWorkStation(string code, string name, decimal hourlyCost) {
+        WorkStation workStation = ObjectSpace.FirstOrDefault<WorkStation>(item => item.Code == code);
+        if(workStation == null) {
+            workStation = ObjectSpace.CreateObject<WorkStation>();
+            workStation.Code = code;
+            workStation.Name = name;
+            workStation.HourlyCost = hourlyCost;
+            workStation.IsActive = true;
+        }
+        return workStation;
+    }
+
+    private Equipment EnsureEquipment(string code, string name, WorkStation workStation) {
+        Equipment equipment = ObjectSpace.FirstOrDefault<Equipment>(item => item.Code == code);
+        if(equipment == null) {
+            equipment = ObjectSpace.CreateObject<Equipment>();
+            equipment.Code = code;
+            equipment.Name = name;
+            equipment.WorkStation = workStation;
+            equipment.IsActive = true;
+        }
+        return equipment;
+    }
+
+    private Operation EnsureOperation(string code, string name, string description) {
+        Operation operation = ObjectSpace.FirstOrDefault<Operation>(item => item.Code == code);
+        if(operation == null) {
+            operation = ObjectSpace.CreateObject<Operation>();
+            operation.Code = code;
+            operation.Name = name;
+            operation.Description = description;
+            operation.IsActive = true;
+        }
+        return operation;
+    }
+
+    private StopCause EnsureStopCause(string code, string name, StopCategory category) {
+        StopCause stopCause = ObjectSpace.FirstOrDefault<StopCause>(item => item.Code == code);
+        if(stopCause == null) {
+            stopCause = ObjectSpace.CreateObject<StopCause>();
+            stopCause.Code = code;
+            stopCause.Name = name;
+            stopCause.Category = category;
+        }
+        return stopCause;
+    }
+
+    private Shift EnsureShift(string shiftName, TimeSpan startTime, TimeSpan endTime) {
+        Shift shift = ObjectSpace.FirstOrDefault<Shift>(item => item.ShiftName == shiftName);
+        if(shift == null) {
+            shift = ObjectSpace.CreateObject<Shift>();
+            shift.ShiftName = shiftName;
+            shift.ShiftTime = startTime;
+            shift.EndTime = endTime;
+            shift.IsActive = true;
+        }
+        return shift;
+    }
+
+    private Employee EnsureEmployee(string registrationNumber, string fullName, EnumEmployeeRole role, Shift shift, WorkStation workStation) {
+        Employee employee = ObjectSpace.FirstOrDefault<Employee>(item => item.RegistrationNumber == registrationNumber);
+        if(employee == null) {
+            employee = ObjectSpace.CreateObject<Employee>();
+            employee.RegistrationNumber = registrationNumber;
+            employee.FullName = fullName;
+            employee.Role = role;
+            employee.AssignedShift = shift;
+            employee.WorkStation = workStation;
+        }
+        return employee;
+    }
+
+    private Routings EnsureRouting(string code, string name) {
+        Routings routing = ObjectSpace.FirstOrDefault<Routings>(item => item.Code == code);
+        if(routing == null) {
+            routing = ObjectSpace.CreateObject<Routings>();
+            routing.Code = code;
+            routing.Name = name;
+        }
+        return routing;
+    }
+
+    private RoutingDetail EnsureRoutingDetail(Routings routing, int sequenceNumber, StockCard stockCard, Operation operation, WorkStation workStation) {
+        string routingCode = routing.Code;
+        RoutingDetail routingDetail = ObjectSpace.FirstOrDefault<RoutingDetail>(
+            item => item.Routings.Code == routingCode && item.SequenceNumber == sequenceNumber);
+        if(routingDetail == null) {
+            routingDetail = ObjectSpace.CreateObject<RoutingDetail>();
+            routingDetail.Routings = routing;
+            routingDetail.SequenceNumber = sequenceNumber;
+            routingDetail.StockCard = stockCard;
+            routingDetail.Operation = operation;
+            routingDetail.WorkStation = workStation;
+        }
+        return routingDetail;
     }
     public override void UpdateDatabaseBeforeUpdateSchema() {
         base.UpdateDatabaseBeforeUpdateSchema();

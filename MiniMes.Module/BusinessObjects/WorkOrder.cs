@@ -17,6 +17,7 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
+    [DefaultProperty(nameof(Code))]
     public class WorkOrder : BaseObject
     { 
         public WorkOrder(Session session)
@@ -27,6 +28,37 @@ namespace MiniMes.Module.BusinessObjects
         {
             base.AfterConstruction();
             Status = WorkOrderStatus.Planned;
+        }
+
+        private string code;
+
+        [RuleRequiredField]
+        [RuleUniqueValue]
+        public string Code
+        {
+            get
+            {
+                return code;
+            }
+            set
+            {
+                SetPropertyValue(nameof(Code), ref code, value);
+            }
+        }
+
+        private int sequenceNumber;
+
+        [RuleRange(0, int.MaxValue)]
+        public int SequenceNumber
+        {
+            get
+            {
+                return sequenceNumber;
+            }
+            set
+            {
+                SetPropertyValue(nameof(SequenceNumber), ref sequenceNumber, value);
+            }
         }
 
         private ProductionOrder productionOrder;
@@ -104,6 +136,7 @@ namespace MiniMes.Module.BusinessObjects
         private decimal producedQuantity;
 
         [RuleRange(0.0, double.MaxValue)]
+        [ModelDefault("AllowEdit", "False")]
         public decimal ProducedQuantity
         {
             get
@@ -119,6 +152,7 @@ namespace MiniMes.Module.BusinessObjects
         private decimal scrapQuantity;
 
         [RuleRange(0.0, double.MaxValue)]
+        [ModelDefault("AllowEdit", "False")]
         public decimal ScrapQuantity
         {
             get
@@ -142,15 +176,15 @@ namespace MiniMes.Module.BusinessObjects
 
         // Deterministic aggregation: always recalculated from the complete ProductionEntries
         // collection instead of incrementally adding/subtracting values, so repeated saves or
-        // edits of an existing entry never double-count. Called from ProductionEntry.OnSaving()
-        // and ProductionEntry.OnDeleting().
+        // edits of an existing entry never double-count. Called by ProductionEntry whenever one
+        // of its quantity/parent properties changes, and again on save and delete.
         public void RecalculateTotals(ProductionEntry excludeEntry = null)
         {
             decimal totalProduced = 0;
             decimal totalScrap = 0;
             foreach (ProductionEntry entry in ProductionEntries)
             {
-                if (entry == excludeEntry)
+                if (entry == excludeEntry || entry.IsDeleted)
                 {
                     continue;
                 }
@@ -159,6 +193,11 @@ namespace MiniMes.Module.BusinessObjects
             }
             ProducedQuantity = totalProduced;
             ScrapQuantity = totalScrap;
+
+            if (Status == WorkOrderStatus.Planned && (totalProduced > 0 || totalScrap > 0))
+            {
+                Status = WorkOrderStatus.InProgress;
+            }
 
             if (ProductionOrder != null)
             {

@@ -16,6 +16,7 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Personnel and Shifts")]
+    [DefaultProperty(nameof(ShiftName))]
     public class Shift : BaseObject
     { 
         public Shift(Session session)
@@ -25,13 +26,13 @@ namespace MiniMes.Module.BusinessObjects
         public override void AfterConstruction()
         {
             base.AfterConstruction();
-           
+            IsActive = true;
         }
 
         private string shiftName;
 
         [RuleRequiredField]
-        
+        [RuleUniqueValue]
         public string ShiftName
         {
             get
@@ -45,7 +46,8 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         private TimeSpan shiftTime;
-        
+
+        [XafDisplayName("Start Time")]
         public TimeSpan ShiftTime
         {
             get

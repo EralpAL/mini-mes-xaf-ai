@@ -26,6 +26,21 @@ namespace MiniMes.Module.BusinessObjects
         public override void AfterConstruction()
         {
             base.AfterConstruction();
+            MaintenanceDate = DateTime.Now;
+        }
+
+        private DateTime maintenanceDate;
+
+        public DateTime MaintenanceDate
+        {
+            get
+            {
+                return maintenanceDate;
+            }
+            set
+            {
+                SetPropertyValue(nameof(MaintenanceDate), ref maintenanceDate, value);
+            }
         }
 
         private WorkStation workStation;
@@ -44,9 +59,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private Equipments equipment;
+        private Equipment equipment;
 
-        public Equipments Equipment
+        [DataSourceProperty("WorkStation.Equipments")]
+        public Equipment Equipment
         {
             get
             {
