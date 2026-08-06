@@ -17,7 +17,7 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
-   
+    [NavigationItem("Production Operations")]
     public class ProductionOrder : BaseObject
     { 
         public ProductionOrder(Session session)
@@ -28,7 +28,7 @@ namespace MiniMes.Module.BusinessObjects
         {
 
             base.AfterConstruction();
-            Status = ProductionOrderStatus.InProgress;
+            Status = ProductionOrderStatus.Planned;
         }
 
         private StockCard targetStockCard;
@@ -49,6 +49,7 @@ namespace MiniMes.Module.BusinessObjects
 
         private decimal plannedQuantity;
 
+        [RuleRange(0.0, double.MaxValue)]
         public decimal PlannedQuantity
         {
             get
@@ -63,6 +64,7 @@ namespace MiniMes.Module.BusinessObjects
 
         private decimal producedQuantity;
 
+        [RuleRange(0.0, double.MaxValue)]
         public decimal ProducedQuantity
         {
             get
@@ -89,21 +91,37 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private String aiDelayAnalysis;
+        private string aiDelayAnalysis;
 
+        [Size(SizeAttribute.Unlimited)]
+        public string AiDelayAnalysis
+        {
+            get
+            {
+                return aiDelayAnalysis;
+            }
+            set
+            {
+                SetPropertyValue(nameof(AiDelayAnalysis), ref aiDelayAnalysis, value);
+            }
+        }
 
+        private string aiOptimizationRecommendation;
 
+        [Size(SizeAttribute.Unlimited)]
+        public string AiOptimizationRecommendation
+        {
+            get
+            {
+                return aiOptimizationRecommendation;
+            }
+            set
+            {
+                SetPropertyValue(nameof(AiOptimizationRecommendation), ref aiOptimizationRecommendation, value);
+            }
+        }
 
-
-
-
-
-
-
-
-
-
-      /*  [Association("ProductionOrder-WorkOrders")]
+        [Association("ProductionOrder-WorkOrders")]
         public XPCollection<WorkOrder> WorkOrders
         {
             get
@@ -112,13 +130,16 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        */
-
-        
-        
-
-
-
-
+        // Recomputed deterministically from the WorkOrders collection whenever a related
+        // ProductionEntry is saved or deleted. See WorkOrder.RecalculateTotals().
+        public void RecalculateTotals()
+        {
+            decimal totalProduced = 0;
+            foreach (WorkOrder workOrder in WorkOrders)
+            {
+                totalProduced += workOrder.ProducedQuantity;
+            }
+            ProducedQuantity = totalProduced;
+        }
     }
 }

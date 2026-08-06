@@ -42,6 +42,7 @@ namespace MiniMes.Module.BusinessObjects {
         }
 
         private decimal hourlyCost;
+        [RuleRange(0.0, double.MaxValue)]
         public decimal HourlyCost
         {
             get { return hourlyCost; }
@@ -68,6 +69,24 @@ namespace MiniMes.Module.BusinessObjects {
             get
             {
                 return GetCollection<Employee>(nameof(Employees));
+            }
+        }
+
+        [Association("WorkStation-MaintenanceLogs")]
+        public XPCollection<MaintenanceLog> MaintenanceLogs
+        {
+            get
+            {
+                return GetCollection<MaintenanceLog>(nameof(MaintenanceLogs));
+            }
+        }
+
+        [Association("WorkStation-Downtimes")]
+        public XPCollection<DowntimeLog> Downtimes
+        {
+            get
+            {
+                return GetCollection<DowntimeLog>(nameof(Downtimes));
             }
         }
 

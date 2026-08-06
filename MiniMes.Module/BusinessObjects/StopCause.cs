@@ -57,5 +57,14 @@ namespace MiniMes.Module.BusinessObjects {
             }
         }
 
+        [Association("StopCause-DowntimeLogs")]
+        public XPCollection<DowntimeLog> DowntimeLogs
+        {
+            get
+            {
+                return GetCollection<DowntimeLog>(nameof(DowntimeLogs));
+            }
+        }
+
     }
 }

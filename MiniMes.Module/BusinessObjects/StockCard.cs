@@ -61,9 +61,9 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Warehouse), ref warehouse, value); }
         }
         [Association("StockCard-Routings")]
-        public XPCollection<Routings> Routings
+        public XPCollection<RoutingDetail> Routings
         {
-            get { return GetCollection<Routings>(nameof(Routings)); }
+            get { return GetCollection<RoutingDetail>(nameof(Routings)); }
         }
 
         [Association("StockCard-ProductionOrders")]

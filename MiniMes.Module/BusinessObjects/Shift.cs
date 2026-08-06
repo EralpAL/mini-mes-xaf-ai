@@ -72,6 +72,20 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
     
+        private bool isActive;
+
+        public bool IsActive
+        {
+            get
+            {
+                return isActive;
+            }
+            set
+            {
+                SetPropertyValue(nameof(IsActive), ref isActive, value);
+            }
+        }
+
         [Association("Shift-Employees")]
         public XPCollection<Employee> Employees
         {

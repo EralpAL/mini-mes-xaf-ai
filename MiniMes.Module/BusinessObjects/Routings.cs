@@ -16,7 +16,7 @@ namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
 
-    public class Routings : BaseObject { 
+    public class Routings : BaseObject {
         public Routings(Session session)
             : base(session) {
         }
@@ -25,27 +25,28 @@ namespace MiniMes.Module.BusinessObjects {
            
         }
 
-        private StockCard stockCard;
-        [Association("StockCard-Routings")]
-        public StockCard StockCard
+        private string routingCode;
+        [RuleRequiredField]
+        [Indexed(Unique = true)]
+        public string Code
         {
-            get { return stockCard; }
-            set { SetPropertyValue(nameof(StockCard), ref stockCard, value); }
+            get { return routingCode; }
+            set { SetPropertyValue(nameof(Code), ref routingCode, value); }
         }
 
-        private int sequenceNumber;
-        public int SequenceNumber
+        private string routingName;
+        [RuleRequiredField]
+        public String Name
         {
-            get { return sequenceNumber; }
-            set { SetPropertyValue(nameof(SequenceNumber), ref sequenceNumber, value); }
+            get { return routingName; }
+            set { SetPropertyValue(nameof(Name), ref routingName, value); }
         }
-    
-        private Operation operation;
-        [Association("Operation-Routings")]
-        public Operation Operation
+
+        [DevExpress.Xpo.Aggregated]
+        [Association("Routings-RoutingDetails")]
+        public XPCollection<RoutingDetail> RoutingDetails
         {
-            get { return operation; }
-            set { SetPropertyValue(nameof(Operation), ref operation, value); }
+            get { return GetCollection<RoutingDetail>(nameof(RoutingDetails)); }
         }
 
     }

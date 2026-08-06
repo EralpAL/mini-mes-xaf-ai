@@ -79,7 +79,14 @@ namespace MiniMes.Module.BusinessObjects {
             }
         }
 
-
+        [Association("Employee-ProductionEntries")]
+        public XPCollection<ProductionEntry> ProductionEntries
+        {
+            get
+            {
+                return GetCollection<ProductionEntry>(nameof(ProductionEntries));
+            }
+        }
 
     }
 

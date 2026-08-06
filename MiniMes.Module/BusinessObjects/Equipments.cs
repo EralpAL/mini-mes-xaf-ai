@@ -34,5 +34,29 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(WorkStation), ref workStation, value); }
         }
 
+        private string equipmentCode;
+        [RuleRequiredField]
+        [Indexed(Unique = true)]
+        public string Code
+        {
+            get { return equipmentCode; }
+            set { SetPropertyValue(nameof(Code), ref equipmentCode, value); }
+        }
+
+        private string equipmentName;
+        [RuleRequiredField]
+        public string Name
+        {
+            get { return equipmentName; }
+            set { SetPropertyValue(nameof(Name), ref equipmentName, value); }
+        }
+
+        private bool isActive;
+        public bool IsActive
+        {
+            get { return isActive; }
+            set { SetPropertyValue(nameof(IsActive), ref isActive, value); }
+        }
+
     }
 }

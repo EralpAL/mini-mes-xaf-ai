@@ -40,10 +40,24 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref operationName, value); }
         }
 
-        [Association("Operation-Routings")]
-        public XPCollection<Routings> Routings
+        private string description;
+        public string Description
         {
-            get { return GetCollection<Routings>(nameof(Routings)); }
+            get { return description; }
+            set { SetPropertyValue(nameof(Description), ref description, value); }
+        }
+
+        private bool isActive;
+        public bool IsActive
+        {
+            get { return isActive; }
+            set { SetPropertyValue(nameof(IsActive), ref isActive, value); }
+        }
+
+        [Association("Operation-Routings")]
+        public XPCollection<RoutingDetail> Routings
+        {
+            get { return GetCollection<RoutingDetail>(nameof(Routings)); }
         }
     }
 }
