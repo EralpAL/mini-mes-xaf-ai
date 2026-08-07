@@ -42,9 +42,9 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref workStationName, value); }
         }
 
-        private decimal hourlyCost;
+        private  double hourlyCost;
         [RuleRange(0.0, double.MaxValue)]
-        public decimal HourlyCost
+        public double HourlyCost
         {
             get { return hourlyCost; }
             set { SetPropertyValue(nameof(HourlyCost), ref hourlyCost, value); }

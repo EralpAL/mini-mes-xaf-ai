@@ -20,7 +20,7 @@ namespace MiniMes.Module.BusinessObjects
     [DefaultProperty(nameof(Code))]
     [RuleCriteria("ProductionOrder_PlannedQuantityGreaterThanZero", DefaultContexts.Save, "PlannedQuantity > 0", CustomMessageTemplate = "Planned quantity must be greater than zero.")]
     public class ProductionOrder : BaseObject
-    { 
+    {
         public ProductionOrder(Session session)
             : base(session)
         {
@@ -64,10 +64,8 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal plannedQuantity;
-
-        [RuleRange(0.0, double.MaxValue)]
-        public decimal PlannedQuantity
+        private int plannedQuantity;
+        public int PlannedQuantity
         {
             get
             {
@@ -79,11 +77,9 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal producedQuantity;
-
-        [RuleRange(0.0, double.MaxValue)]
+        private int producedQuantity;
         [ModelDefault("AllowEdit", "False")]
-        public decimal ProducedQuantity
+        public int ProducedQuantity
         {
             get
             {
@@ -164,7 +160,7 @@ namespace MiniMes.Module.BusinessObjects
                 }
             }
 
-            decimal producedAtLastStep = 0;
+            int producedAtLastStep = 0;
             foreach (WorkOrder workOrder in WorkOrders)
             {
                 if (!workOrder.IsDeleted && workOrder.SequenceNumber == lastSequenceNumber)

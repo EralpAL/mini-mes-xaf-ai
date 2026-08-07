@@ -133,11 +133,11 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal producedQuantity;
+        private int producedQuantity;
 
-        [RuleRange(0.0, double.MaxValue)]
+        [RuleRange(0, int.MaxValue)]
         [ModelDefault("AllowEdit", "False")]
-        public decimal ProducedQuantity
+        public int ProducedQuantity
         {
             get
             {
@@ -149,11 +149,11 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal scrapQuantity;
+        private int scrapQuantity;
 
-        [RuleRange(0.0, double.MaxValue)]
+        [RuleRange(0, int.MaxValue)]
         [ModelDefault("AllowEdit", "False")]
-        public decimal ScrapQuantity
+        public int ScrapQuantity
         {
             get
             {
@@ -180,8 +180,8 @@ namespace MiniMes.Module.BusinessObjects
         // of its quantity/parent properties changes, and again on save and delete.
         public void RecalculateTotals(ProductionEntry excludeEntry = null)
         {
-            decimal totalProduced = 0;
-            decimal totalScrap = 0;
+            int totalProduced = 0;
+            int totalScrap = 0;
             foreach (ProductionEntry entry in ProductionEntries)
             {
                 if (entry == excludeEntry || entry.IsDeleted)

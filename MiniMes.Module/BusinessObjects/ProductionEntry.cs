@@ -91,10 +91,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal realizedAmount;
+        private int realizedAmount;
 
-        [RuleRange(0.0, double.MaxValue)]
-        public decimal RealizedAmount
+        [RuleRange(0, int.MaxValue)]
+        public int RealizedAmount
         {
             get
             {
@@ -109,10 +109,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal scrapAmount;
+        private int scrapAmount;
 
-        [RuleRange(0.0, double.MaxValue)]
-        public decimal ScrapAmount
+        [RuleRange(0, int.MaxValue)]
+        public int ScrapAmount
         {
             get
             {

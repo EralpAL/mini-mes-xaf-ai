@@ -77,9 +77,9 @@ public class Updater : ModuleUpdater {
         StockCard cutBlank = EnsureStockCard("SF-001", "Cut Blank", EnumStockType.SemiFinished, mainWarehouse);
         StockCard bracket = EnsureStockCard("FP-001", "Steel Bracket", EnumStockType.FinishedProduct, mainWarehouse);
 
-        WorkStation cuttingStation = EnsureWorkStation("CNC-01", "CNC Cutting Machine", 320m);
-        WorkStation pressStation = EnsureWorkStation("PRS-01", "Hydraulic Press", 210m);
-        WorkStation assemblyStation = EnsureWorkStation("ASM-01", "Assembly Line", 150m);
+        WorkStation cuttingStation = EnsureWorkStation("CNC-01", "CNC Cutting Machine", 320.0);
+        WorkStation pressStation = EnsureWorkStation("PRS-01", "Hydraulic Press", 210.0);
+        WorkStation assemblyStation = EnsureWorkStation("ASM-01", "Assembly Line", 150.0);
 
         EnsureEquipment("EQ-01", "Cutting Head", cuttingStation);
         EnsureEquipment("EQ-02", "Bracket Mold", pressStation);
@@ -137,7 +137,7 @@ public class Updater : ModuleUpdater {
         return stockCard;
     }
 
-    private WorkStation EnsureWorkStation(string code, string name, decimal hourlyCost) {
+    private WorkStation EnsureWorkStation(string code, string name, double hourlyCost) {
         WorkStation workStation = ObjectSpace.FirstOrDefault<WorkStation>(item => item.Code == code);
         if(workStation == null) {
             workStation = ObjectSpace.CreateObject<WorkStation>();
