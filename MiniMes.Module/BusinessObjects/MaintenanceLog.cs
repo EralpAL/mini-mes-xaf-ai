@@ -103,10 +103,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal cost;
+        private double cost;
 
         [RuleRange(0.0, double.MaxValue)]
-        public decimal Cost
+        public double Cost
         {
             get
             {

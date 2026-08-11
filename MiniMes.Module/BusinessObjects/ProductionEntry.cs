@@ -17,7 +17,6 @@ namespace MiniMes.Module.BusinessObjects
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
     [RuleCriteria("ProductionEntry_QuantityEntered", DefaultContexts.Save, "RealizedAmount + ScrapAmount > 0", CustomMessageTemplate = "Enter a realized quantity, a scrap quantity, or both.")]
-    [RuleCriteria("ProductionEntry_ScrapReasonRequired", DefaultContexts.Save, "Not (ScrapAmount > 0 And IsNullOrEmpty(ScrapReason))", CustomMessageTemplate = "Specify a scrap reason when a scrap quantity is reported.")]
     public class ProductionEntry : BaseObject
     { 
         public ProductionEntry(Session session)
@@ -187,6 +186,15 @@ namespace MiniMes.Module.BusinessObjects
         protected override void OnSaving()
         {
             base.OnSaving();
+
+            if (ScrapAmount > 0)
+            {
+                if (string.IsNullOrWhiteSpace(ScrapReason))
+                {
+                    throw new UserFriendlyException("Specify a scrap reason when a scrap quantity is reported.");
+                }
+            }
+
             if (WorkOrder != null)
             {
                 WorkOrder.RecalculateTotals();

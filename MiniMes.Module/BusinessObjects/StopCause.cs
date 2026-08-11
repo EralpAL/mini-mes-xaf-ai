@@ -12,6 +12,7 @@ using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using MiniMes.Module.Enums;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
@@ -19,17 +20,27 @@ namespace MiniMes.Module.BusinessObjects {
     [DefaultProperty(nameof(Name))]
 
     public class StopCause : BaseObject {
+        private const string CodePrefix = "STP";
+
         public StopCause(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-            
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StopCause), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StopCause), CodePrefix);
+            }
         }
 
         private string stopCauseCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return stopCauseCode; }

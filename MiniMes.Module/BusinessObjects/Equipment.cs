@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
@@ -18,13 +19,22 @@ namespace MiniMes.Module.BusinessObjects {
     [DefaultProperty(nameof(Name))]
 
     public class Equipment : BaseObject { 
-        
+        private const string CodePrefix = "EQ";
+
         public Equipment(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
             IsActive = true;
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Equipment), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Equipment), CodePrefix);
+            }
         }
 
         private WorkStation workStation;
@@ -38,6 +48,7 @@ namespace MiniMes.Module.BusinessObjects {
         private string equipmentCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return equipmentCode; }

@@ -7,6 +7,7 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 using MiniMes.Module.Enums;
+using MiniMes.Module.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,6 +22,8 @@ namespace MiniMes.Module.BusinessObjects
     [RuleCriteria("ProductionOrder_PlannedQuantityGreaterThanZero", DefaultContexts.Save, "PlannedQuantity > 0", CustomMessageTemplate = "Planned quantity must be greater than zero.")]
     public class ProductionOrder : BaseObject
     {
+        private const string CodePrefix = "PO";
+
         public ProductionOrder(Session session)
             : base(session)
         {
@@ -30,12 +33,24 @@ namespace MiniMes.Module.BusinessObjects
 
             base.AfterConstruction();
             Status = ProductionOrderStatus.Planned;
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(ProductionOrder), CodePrefix);
+        }
+
+        protected override void OnSaving()
+        {
+            base.OnSaving();
+
+            if (string.IsNullOrEmpty(Code))
+            {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(ProductionOrder), CodePrefix);
+            }
         }
 
         private string code;
 
         [RuleRequiredField]
         [RuleUniqueValue]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get

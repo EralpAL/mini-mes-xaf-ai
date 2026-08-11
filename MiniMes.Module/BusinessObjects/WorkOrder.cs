@@ -7,6 +7,7 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 using MiniMes.Module.Enums;
+using MiniMes.Module.Services;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,6 +21,8 @@ namespace MiniMes.Module.BusinessObjects
     [DefaultProperty(nameof(Code))]
     public class WorkOrder : BaseObject
     { 
+        private const string CodePrefix = "WO";
+
         public WorkOrder(Session session)
             : base(session)
         {
@@ -28,12 +31,27 @@ namespace MiniMes.Module.BusinessObjects
         {
             base.AfterConstruction();
             Status = WorkOrderStatus.Planned;
+
+            // The Approve action of a Production Order replaces this code with one derived from
+            // the order code. A Work Order created directly by a user keeps the generated code.
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkOrder), CodePrefix);
+        }
+
+        protected override void OnSaving()
+        {
+            base.OnSaving();
+
+            if (string.IsNullOrEmpty(Code))
+            {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkOrder), CodePrefix);
+            }
         }
 
         private string code;
 
         [RuleRequiredField]
         [RuleUniqueValue]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get

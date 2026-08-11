@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Components.Server.Circuits;
 using DevExpress.ExpressApp.Xpo;
 using MiniMes.Blazor.Server.Services;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 namespace MiniMes.Blazor.Server;
 
@@ -80,6 +82,19 @@ public class Startup {
                     options.IsSupportChangePassword = true;
                 });
         });
+        // XAF reads the same language list from the "DevExpress:ExpressApp:Languages" setting in
+        // appsettings.json. The cultures are repeated here so that RequestLocalizationMiddleware
+        // detects the browser culture and falls back to English for every unsupported language.
+        services.Configure<RequestLocalizationOptions>(options => {
+            List<CultureInfo> supportedCultures = new List<CultureInfo>();
+            supportedCultures.Add(new CultureInfo("en-US"));
+            supportedCultures.Add(new CultureInfo("tr-TR"));
+
+            options.DefaultRequestCulture = new RequestCulture("en-US");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
+
         var authentication = services.AddAuthentication(options => {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         });

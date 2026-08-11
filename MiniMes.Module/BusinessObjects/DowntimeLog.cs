@@ -16,7 +16,10 @@ namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
     [NavigationItem("Production Operations")]
-    [RuleCriteria("DowntimeLog_DurationGreaterThanZero", DefaultContexts.Save, "DurationMinutes > 0", CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
+    [RuleCriteria("DowntimeLog_DurationGreaterThanZero",
+        DefaultContexts.Save,
+        "DurationMinutes > 0", 
+        CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
     public class DowntimeLog : BaseObject
     { 
         public DowntimeLog(Session session)
@@ -103,10 +106,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private decimal durationMinutes;
+        private double durationMinutes;
 
         [RuleRange(0.0, double.MaxValue)]
-        public decimal DurationMinutes
+        public double DurationMinutes
         {
             get
             {

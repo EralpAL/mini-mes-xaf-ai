@@ -11,23 +11,35 @@ using System.Collections.Generic;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
     [DefaultProperty(nameof(Name))]
     public class Operation : BaseObject { 
+        private const string CodePrefix = "OP";
+
         public Operation(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
             IsActive = true;
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+            }
         }
 
         private string operationCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return operationCode; }
