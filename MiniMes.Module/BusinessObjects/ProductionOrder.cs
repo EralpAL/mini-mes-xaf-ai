@@ -152,18 +152,28 @@ namespace MiniMes.Module.BusinessObjects
         public void RecalculateTotals()
         {
             int lastSequenceNumber = int.MinValue;
-            foreach (WorkOrder workOrder in WorkOrders)
+
+            // Son operasyonun sıra numarasını bul
+            for (int i = 0; i < WorkOrders.Count; i++)
             {
-                if (!workOrder.IsDeleted && workOrder.SequenceNumber > lastSequenceNumber)
+                WorkOrder workOrder = WorkOrders[i];
+
+                if (!workOrder.IsDeleted &&
+                    workOrder.SequenceNumber > lastSequenceNumber)
                 {
                     lastSequenceNumber = workOrder.SequenceNumber;
                 }
             }
 
             int producedAtLastStep = 0;
-            foreach (WorkOrder workOrder in WorkOrders)
+
+            // Son operasyonda üretilen miktarları topla
+            for (int i = 0; i < WorkOrders.Count; i++)
             {
-                if (!workOrder.IsDeleted && workOrder.SequenceNumber == lastSequenceNumber)
+                WorkOrder workOrder = WorkOrders[i];
+
+                if (!workOrder.IsDeleted &&
+                    workOrder.SequenceNumber == lastSequenceNumber)
                 {
                     producedAtLastStep += workOrder.ProducedQuantity;
                 }

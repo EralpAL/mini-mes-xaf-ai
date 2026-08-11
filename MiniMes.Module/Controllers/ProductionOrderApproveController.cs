@@ -136,9 +136,27 @@ namespace MiniMes.Module.Controllers
                 throw new UserFriendlyException("Work Orders have already been generated for this Production Order.");
             }
 
-            List<RoutingDetail> routingDetails = productionOrder.TargetStockCard.Routings
-                .OrderBy(detail => detail.SequenceNumber)
-                .ToList();
+            List<RoutingDetail> routingDetails = new List<RoutingDetail>();
+
+            for (int i = 0; i < productionOrder.TargetStockCard.Routings.Count; i++)
+            {
+                RoutingDetail routingDetail = productionOrder.TargetStockCard.Routings[i];
+                routingDetails.Add(routingDetail);
+            }
+
+            // The routing steps must run in ascending SequenceNumber order.
+            for (int i = 0; i < routingDetails.Count - 1; i++)
+            {
+                for (int j = 0; j < routingDetails.Count - 1 - i; j++)
+                {
+                    if (routingDetails[j].SequenceNumber > routingDetails[j + 1].SequenceNumber)
+                    {
+                        RoutingDetail temporaryDetail = routingDetails[j];
+                        routingDetails[j] = routingDetails[j + 1];
+                        routingDetails[j + 1] = temporaryDetail;
+                    }
+                }
+            }
 
             if (routingDetails.Count == 0)
             {
@@ -148,9 +166,12 @@ namespace MiniMes.Module.Controllers
             IObjectSpace objectSpace = View.ObjectSpace;
             int stepNumber = 0;
 
-            foreach (RoutingDetail routingDetail in routingDetails)
+            for (int i = 0; i < routingDetails.Count; i++)
             {
-                stepNumber++;
+                RoutingDetail routingDetail = routingDetails[i];
+
+                stepNumber = stepNumber + 1;
+
                 WorkOrder workOrder = objectSpace.CreateObject<WorkOrder>();
                 workOrder.Code = string.Format("{0}-{1:000}", productionOrder.Code, stepNumber);
                 workOrder.SequenceNumber = routingDetail.SequenceNumber;
@@ -184,8 +205,10 @@ namespace MiniMes.Module.Controllers
                 throw new UserFriendlyException("The order cannot be completed before any production has been reported.");
             }
 
-            foreach (WorkOrder workOrder in productionOrder.WorkOrders)
+            for (int i = 0; i < productionOrder.WorkOrders.Count; i++)
             {
+                WorkOrder workOrder = productionOrder.WorkOrders[i];
+
                 if (workOrder.Status == WorkOrderStatus.Planned || workOrder.Status == WorkOrderStatus.InProgress)
                 {
                     workOrder.Status = WorkOrderStatus.Completed;
@@ -194,7 +217,7 @@ namespace MiniMes.Module.Controllers
 
             productionOrder.Status = ProductionOrderStatus.Completed;
 
-            View.ObjectSpace.CommitChanges();
+           ObjectSpace.CommitChanges();
             UpdateActionState();
 
             Application.ShowViewStrategy.ShowMessage("Production Order completed.", InformationType.Success);
@@ -210,8 +233,10 @@ namespace MiniMes.Module.Controllers
                 throw new UserFriendlyException("Completed or already canceled Production Orders cannot be canceled.");
             }
 
-            foreach (WorkOrder workOrder in productionOrder.WorkOrders)
+            for (int i = 0; i < productionOrder.WorkOrders.Count; i++)
             {
+                WorkOrder workOrder = productionOrder.WorkOrders[i];
+
                 if (workOrder.Status != WorkOrderStatus.Completed)
                 {
                     workOrder.Status = WorkOrderStatus.Canceled;

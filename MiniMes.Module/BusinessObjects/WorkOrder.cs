@@ -182,15 +182,20 @@ namespace MiniMes.Module.BusinessObjects
         {
             int totalProduced = 0;
             int totalScrap = 0;
-            foreach (ProductionEntry entry in ProductionEntries)
+
+            for (int i = 0; i < ProductionEntries.Count; i++)
             {
+                ProductionEntry entry = ProductionEntries[i];
+
                 if (entry == excludeEntry || entry.IsDeleted)
                 {
                     continue;
                 }
-                totalProduced += entry.RealizedAmount;
-                totalScrap += entry.ScrapAmount;
+
+                totalProduced = totalProduced + entry.RealizedAmount;
+                totalScrap = totalScrap + entry.ScrapAmount;
             }
+
             ProducedQuantity = totalProduced;
             ScrapQuantity = totalScrap;
 
