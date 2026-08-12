@@ -18,6 +18,7 @@ namespace MiniMes.Module.Controllers
         protected override void OnActivated()
         {
             base.OnActivated();
+          
         }
 
         protected override void OnViewControlsCreated()

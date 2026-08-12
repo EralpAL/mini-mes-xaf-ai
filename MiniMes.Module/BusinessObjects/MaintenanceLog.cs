@@ -16,6 +16,7 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [XafDisplayName("Bakým Kaydý")]
     [NavigationItem("Production Operations")]
     public class MaintenanceLog : BaseObject
     { 
@@ -74,18 +75,18 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private Employee technician;
+        private Employee employee;
 
         [RuleRequiredField]
-        public Employee Technician
+        public Employee Employee
         {
             get
             {
-                return technician;
+                return employee;
             }
             set
             {
-                SetPropertyValue(nameof(Technician), ref technician, value);
+                SetPropertyValue(nameof(Employee), ref employee, value);
             }
         }
 

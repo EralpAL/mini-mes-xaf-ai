@@ -14,40 +14,41 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace MiniMes.Module.BusinessObjects135
+namespace MiniMes.Module.BusinessObjects
+{
     [DefaultClassOptions]
     [XafDisplayName("Üretim Emri")]
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
-    [RuleCriteria("ProductionOrder_Rule1",DefaultContexts.Save,"PlannedQuantity > 0",CustomMessageTemplate = "Planned quantity must be greater than zero!!")]
-    [RuleCriteria("ProductionOrder_Rule2",DefaultContexts.Save, "TargetStockCard != null", CustomMessageTemplate = "Target Stock Card must be selected!!")]
+    [RuleCriteria("ProductionOrder_Rule1",DefaultContexts.Save,"PlannedQuantity > 0",CustomMessageTemplate ="Planned quantity must be greater than zero!!")]
+    // Rule 2 sildim stockCard zaten rule ile kontrol ediliyor,
+    // ayrıca stockCard boş olamaz çünkü requiredfield attribute var
     public class ProductionOrder : BaseObject
     {
-    private const string CodePrefix = "PO";
-        private static int codeNumber = 1;
-
-
         public ProductionOrder(Session session)
             : base(session)
         {
         }
+
+        private const string CodePrefix = "PO";
+
         public override void AfterConstruction()
         {
-
             base.AfterConstruction();
+
             Status = ProductionOrderStatus.Planned;
-            Code = CodePrefix + "-" + codeNumber.ToString("D4");
-            codeNumber++;
-    }
+
+            Code = BusinessCodeGenerator.GenerateCode(Session,typeof(ProductionOrder),CodePrefix);
+        }
 
         protected override void OnSaving()
         {
-            base.OnSaving();
-
             if (string.IsNullOrEmpty(Code))
             {
-                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(ProductionOrder), CodePrefix);
+                Code = BusinessCodeGenerator.GenerateCode( Session,typeof(ProductionOrder),CodePrefix);
             }
+
+            base.OnSaving();
         }
 
         private string code;
@@ -80,11 +81,12 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(StockCard), ref targetStockCard, value);
+                SetPropertyValue( nameof(StockCard), ref targetStockCard,value);
             }
         }
 
         private int plannedQuantity;
+
         public int PlannedQuantity
         {
             get
@@ -93,11 +95,12 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(PlannedQuantity), ref plannedQuantity, value);
+                SetPropertyValue( nameof(PlannedQuantity),ref plannedQuantity,value);
             }
         }
 
         private int producedQuantity;
+
         [ModelDefault("AllowEdit", "False")]
         public int ProducedQuantity
         {
@@ -107,7 +110,70 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(ProducedQuantity), ref producedQuantity, value);
+                SetPropertyValue(nameof(ProducedQuantity),ref producedQuantity,value);
+            }
+        }
+
+        // Üretim emrine bağlı bütün iş emirlerindeki
+        // toplam fire miktarını tutar.
+        private int scrapQuantity;
+
+        [ModelDefault("AllowEdit", "False")]
+        public int ScrapQuantity
+        {
+            get
+            {
+                return scrapQuantity;
+            }
+            set
+            {
+                SetPropertyValue( nameof(ScrapQuantity), ref scrapQuantity,value);
+            }
+        }
+
+        // Henüz tamamlanmamış miktarı hesaplar.
+        // Veritabanında ayrı bir kolon olarak tutulmaz.
+        [NonPersistent]
+        [ModelDefault("AllowEdit", "False")]
+        public int RemainingQuantity
+        {
+            get
+            {
+                int remainingQuantity = PlannedQuantity -ProducedQuantity -ScrapQuantity;
+
+                if (remainingQuantity < 0)
+                {
+                    return 0;
+                }
+
+                return remainingQuantity;
+            }
+        }
+
+        // Üretilen ve fire olarak işlenen toplam miktarın
+        // planlanan miktara oranını hesaplar.
+        [NonPersistent]
+        [ModelDefault("AllowEdit", "False")]
+        [ModelDefault("DisplayFormat", "{0:N2} %")]
+        public double CompletionPercentage
+        {
+            get
+            {
+                if (PlannedQuantity <= 0)
+                {
+                    return 0;
+                }
+
+                double processedQuantity = ProducedQuantity + ScrapQuantity;
+
+                double percentage = processedQuantity * 100 / PlannedQuantity;
+
+                if (percentage > 100)
+                {
+                    return 100;
+                }
+
+                return percentage;
             }
         }
 
@@ -122,7 +188,7 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(Status), ref status, value);
+                SetPropertyValue(nameof(Status), ref status,value);
             }
         }
 
@@ -137,7 +203,7 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(AiDelayAnalysis), ref aiDelayAnalysis, value);
+                SetPropertyValue( nameof(AiDelayAnalysis),ref aiDelayAnalysis,value);
             }
         }
 
@@ -152,7 +218,10 @@ namespace MiniMes.Module.BusinessObjects135
             }
             set
             {
-                SetPropertyValue(nameof(AiOptimizationRecommendation), ref aiOptimizationRecommendation, value);
+                SetPropertyValue(
+                    nameof(AiOptimizationRecommendation),
+                    ref aiOptimizationRecommendation,
+                    value);
             }
         }
 
@@ -161,45 +230,56 @@ namespace MiniMes.Module.BusinessObjects135
         {
             get
             {
-                return GetCollection<WorkOrder>(nameof(WorkOrders));
+                return GetCollection<WorkOrder>(
+                    nameof(WorkOrders));
             }
         }
 
-        // Recomputed deterministically from the WorkOrders collection whenever a related
-        // ProductionEntry changes. The order's produced quantity is the output of its last
-        // routing step, because every step reports the same physical items again.
-        // See WorkOrder.RecalculateTotals().
+        // Üretim emrindeki en son operasyonu bulur.
+        // Üretilen sağlam miktarı yalnızca son operasyondan alır.
+        // Fire miktarını ise bütün iş emirlerinden toplar.
         public void RecalculateTotals()
         {
             int lastSequenceNumber = int.MinValue;
+            int totalScrap = 0;
 
-            // Son operasyonun sıra numarasını bul
+            // Son operasyonu bul ve bütün fireleri topla.
             for (int i = 0; i < WorkOrders.Count; i++)
             {
                 WorkOrder workOrder = WorkOrders[i];
 
-                if (!workOrder.IsDeleted &&
-                    workOrder.SequenceNumber > lastSequenceNumber)
+                if (workOrder.IsDeleted)
                 {
-                    lastSequenceNumber = workOrder.SequenceNumber;
+                    continue;
+                }
+
+                totalScrap += workOrder.ScrapQuantity;
+
+                if (workOrder.SequenceNumber > lastSequenceNumber)
+                {
+                    lastSequenceNumber =workOrder.SequenceNumber;
                 }
             }
 
             int producedAtLastStep = 0;
 
-            // Son operasyonda üretilen miktarları topla
+            // Yalnızca son operasyondaki sağlam üretimi topla.
             for (int i = 0; i < WorkOrders.Count; i++)
             {
                 WorkOrder workOrder = WorkOrders[i];
 
-                if (!workOrder.IsDeleted &&
-                    workOrder.SequenceNumber == lastSequenceNumber)
+                if (!workOrder.IsDeleted &&workOrder.SequenceNumber ==lastSequenceNumber)
                 {
-                    producedAtLastStep += workOrder.ProducedQuantity;
+                    producedAtLastStep +=workOrder.ProducedQuantity;
                 }
             }
 
             ProducedQuantity = producedAtLastStep;
+            ScrapQuantity = totalScrap;
+
+            // Hesaplanan alanların ekranda yenilenmesini sağlar.
+            OnChanged(nameof(RemainingQuantity));
+            OnChanged(nameof(CompletionPercentage));
         }
     }
 }

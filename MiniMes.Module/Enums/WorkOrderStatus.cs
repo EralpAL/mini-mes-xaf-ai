@@ -19,6 +19,6 @@ namespace MiniMes.Module.Enums
         Planned,
         InProgress,
         Completed,
-        Canceled
+        Stopped
     }
 }

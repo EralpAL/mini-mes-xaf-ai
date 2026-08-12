@@ -9,6 +9,8 @@ using DevExpress.ExpressApp.Templates;
 using DevExpress.ExpressApp.Utils;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.BusinessObjects;
+using MiniMes.Module.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,30 +18,106 @@ using System.Text;
 
 namespace MiniMes.Module.Controllers
 {
-    // For more typical usage scenarios, be sure to check out https://documentation.devexpress.com/eXpressAppFramework/clsDevExpressExpressAppViewControllertopic.aspx.
     public partial class ViewControllerWorkOrder : ViewController
     {
-        // Use CodeRush to create Controllers and Actions with a few keystrokes.
-        // https://docs.devexpress.com/CodeRushForRoslyn/403133/
         public ViewControllerWorkOrder()
         {
             InitializeComponent();
-            // Target required Views (via the TargetXXX properties) and create their Actions.
+
+            TargetObjectType = typeof(WorkOrder);
+            TargetViewType = ViewType.ListView;
         }
+
         protected override void OnActivated()
         {
             base.OnActivated();
-            // Perform various tasks depending on the target View.
+            View.AllowNew["ManualWorkOrderCreationDisabled"] = false;
         }
+
         protected override void OnViewControlsCreated()
         {
             base.OnViewControlsCreated();
-            // Access and customize the target View control.
         }
+
         protected override void OnDeactivated()
         {
-            // Unsubscribe from previously subscribed events and release other references and resources.
             base.OnDeactivated();
+        }
+
+        private void WorkOrder_Start_Execute( object sender,SimpleActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+
+            if (workOrder == null)
+                return;
+
+            if (workOrder.Status != WorkOrderStatus.Planned)
+            {
+                throw new UserFriendlyException(
+                    "Yalnızca planlanan iş emirleri başlatılabilir.");
+            }
+
+            workOrder.Status = WorkOrderStatus.InProgress;
+
+            ObjectSpace.CommitChanges();
+            View.ObjectSpace.Refresh();
+        }
+
+        private void WorkOrder_Stop_Execute(object sender,SimpleActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+
+            if (workOrder == null)
+                return;
+
+            if (workOrder.Status != WorkOrderStatus.InProgress)
+            {
+                throw new UserFriendlyException(
+                    "Yalnızca devam eden iş emirleri durdurulabilir.");
+            }
+
+            workOrder.Status = WorkOrderStatus.Stopped;
+
+            ObjectSpace.CommitChanges();
+            View.ObjectSpace.Refresh();
+        }
+
+        private void WorkOrder_Resume_Execute(object sender,SimpleActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+
+            if (workOrder == null)
+                return;
+
+            if (workOrder.Status != WorkOrderStatus.Stopped)
+            {
+                throw new UserFriendlyException(
+                    "Yalnızca durdurulmuş iş emirlerine devam edilebilir.");
+            }
+
+            workOrder.Status = WorkOrderStatus.InProgress;
+
+            ObjectSpace.CommitChanges();
+            View.ObjectSpace.Refresh();
+        }
+
+        private void WorkOrder_Complete_Execute(object sender,SimpleActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+
+            if (workOrder == null)
+                return;
+
+            if (workOrder.Status != WorkOrderStatus.InProgress)
+            {
+                throw new UserFriendlyException(
+                    "Yalnızca devam eden iş emirleri tamamlanabilir.");
+            }
+
+            workOrder.Status = WorkOrderStatus.Completed;
+
+            ObjectSpace.CommitChanges();
+            View.ObjectSpace.Refresh();
         }
     }
 }

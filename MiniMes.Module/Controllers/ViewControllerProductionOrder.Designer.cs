@@ -43,7 +43,13 @@
             this.ProductionOrder_Approve.ImageName = "Apply_16x16";
             this.ProductionOrder_Approve.TargetObjectType =typeof(MiniMes.Module.BusinessObjects.ProductionOrder);
             this.ProductionOrder_Approve.ToolTip ="Generate Work Orders from the routing and start the Production Order.";
-            this.ProductionOrder_Approve.TargetObjectsCriteria ="Status = Planned";
+
+            //değişiklik
+            this.ProductionOrder_Approve.SelectionDependencyType =DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
+            this.ProductionOrder_Approve.TargetObjectsCriteria ="Status = ##Enum#MiniMes.Module.Enums.ProductionOrderStatus,Planned#";
+
+
+
             this.ProductionOrder_Approve.Execute +=new DevExpress.ExpressApp.Actions.SimpleActionExecuteEventHandler(this.ProductionOrder_Approve_Execute);
             //
             // ViewControllerProductionOrder

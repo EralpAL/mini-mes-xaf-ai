@@ -16,31 +16,41 @@ using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
+    [XafDisplayName("Duruş Nedeni Parametre Tablosu):")]
     [NavigationItem("Production Definitions")]
     [DefaultProperty(nameof(Name))]
 
     public class StopCause : BaseObject {
+
         private const string CodePrefix = "STP";
 
         public StopCause(Session session)
-            : base(session) {
-        }
-        public override void AfterConstruction() {
-            base.AfterConstruction();
-            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StopCause), CodePrefix);
+            : base(session)
+        {
         }
 
-        protected override void OnSaving() {
-            base.OnSaving();
-            if (string.IsNullOrEmpty(Code)) {
-                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StopCause), CodePrefix);
+        public override void AfterConstruction()
+        {
+            base.AfterConstruction();
+
+            Code = BusinessCodeGenerator.GenerateCode( Session,typeof(StopCause),CodePrefix);
+        }
+
+        protected override void OnSaving()
+        {
+            if (string.IsNullOrEmpty(Code))
+            {
+                Code = BusinessCodeGenerator.GenerateCode(Session,typeof(StopCause),CodePrefix);
             }
+
+            base.OnSaving();
         }
 
         private string stopCauseCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
         [ModelDefault("AllowEdit", "False")]
+
         public string Code
         {
             get { return stopCauseCode; }

@@ -15,11 +15,9 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [XafDisplayName("Duruþ Kaydý")]
     [NavigationItem("Production Operations")]
-    [RuleCriteria("DowntimeLog_DurationGreaterThanZero",
-        DefaultContexts.Save,
-        "DurationMinutes > 0", 
-        CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
+    [RuleCriteria("DowntimeLog_DurationGreaterThanZero", DefaultContexts.Save,"DurationMinutes > 0", CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
     public class DowntimeLog : BaseObject
     { 
         public DowntimeLog(Session session)

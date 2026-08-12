@@ -17,34 +17,36 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [XafDisplayName("İş Emri")]
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
+    
     public class WorkOrder : BaseObject
-    { 
+    {
         private const string CodePrefix = "WO";
 
         public WorkOrder(Session session)
             : base(session)
         {
         }
+
         public override void AfterConstruction()
         {
             base.AfterConstruction();
+
             Status = WorkOrderStatus.Planned;
 
-            // The Approve action of a Production Order replaces this code with one derived from
-            // the order code. A Work Order created directly by a user keeps the generated code.
-            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkOrder), CodePrefix);
+            Code = BusinessCodeGenerator.GenerateCode( Session,typeof(WorkOrder),CodePrefix);
         }
 
         protected override void OnSaving()
         {
-            base.OnSaving();
-
             if (string.IsNullOrEmpty(Code))
             {
-                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkOrder), CodePrefix);
+                Code = BusinessCodeGenerator.GenerateCode(Session,typeof(WorkOrder),CodePrefix);
             }
+
+            base.OnSaving();
         }
 
         private string code;
@@ -63,6 +65,14 @@ namespace MiniMes.Module.BusinessObjects
                 SetPropertyValue(nameof(Code), ref code, value);
             }
         }
+
+        /* operasyonun üretim sırasındaki kaçıncı adım olduğunu gösterir.
+         SequenceNumber     Operasyon
+                1	        Kesim
+                2	        Montaj
+                3	        Boyama
+                4	        Paketleme 
+        */
 
         private int sequenceNumber;
 
@@ -192,10 +202,10 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        // Deterministic aggregation: always recalculated from the complete ProductionEntries
-        // collection instead of incrementally adding/subtracting values, so repeated saves or
-        // edits of an existing entry never double-count. Called by ProductionEntry whenever one
-        // of its quantity/parent properties changes, and again on save and delete.
+
+        // Üretim girişleri değiştiğinde toplamları baştan hesaplar.
+        // Böylece tekrar kaydetme veya düzenleme sırasında çift sayım oluşmaz.
+
         public void RecalculateTotals(ProductionEntry excludeEntry = null)
         {
             int totalProduced = 0;

@@ -15,6 +15,7 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
+    [XafDisplayName("Üretim Giriþi & Fire Kaydý")]
     [NavigationItem("Production Operations")]
     [RuleCriteria("ProductionEntry_QuantityEntered", DefaultContexts.Save, "RealizedAmount + ScrapAmount > 0", CustomMessageTemplate = "Enter a realized quantity, a scrap quantity, or both.")]
     public class ProductionEntry : BaseObject
@@ -42,6 +43,8 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
+
+                // Ýþ emri deðiþtiðinde istasyonu ve eski-yeni iþ emirlerinin toplamlarýný günceller.
                 WorkOrder previousWorkOrder = workOrder;
                 if (!SetPropertyValue(nameof(WorkOrder), ref workOrder, value) || IsLoading || IsSaving)
                 {
@@ -188,6 +191,8 @@ namespace MiniMes.Module.BusinessObjects
             base.OnSaving();
 
             if (ScrapAmount > 0)
+
+            //ScrapReason boþ, null veya yalnýzca boþluklardan oluþuyorsa:
             {
                 if (string.IsNullOrWhiteSpace(ScrapReason))
                 {
@@ -195,6 +200,7 @@ namespace MiniMes.Module.BusinessObjects
                 }
             }
 
+            // Ýþ emrine baðlýysa toplamlarý baþtan hesaplar.
             if (WorkOrder != null)
             {
                 WorkOrder.RecalculateTotals();
@@ -205,6 +211,8 @@ namespace MiniMes.Module.BusinessObjects
         {
             WorkOrder affectedWorkOrder = WorkOrder;
             base.OnDeleting();
+
+            //Silinen üretim giriþini hesaba katmadan eski iþ emrinin toplamlarýný yeniden hesaplar.
             if (affectedWorkOrder != null)
             {
                 affectedWorkOrder.RecalculateTotals(this);
