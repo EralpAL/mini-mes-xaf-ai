@@ -14,15 +14,18 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
-namespace MiniMes.Module.BusinessObjects
-{
+namespace MiniMes.Module.BusinessObjects135
     [DefaultClassOptions]
+    [XafDisplayName("Üretim Emri")]
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
-    [RuleCriteria("ProductionOrder_PlannedQuantityGreaterThanZero", DefaultContexts.Save, "PlannedQuantity > 0", CustomMessageTemplate = "Planned quantity must be greater than zero.")]
+    [RuleCriteria("ProductionOrder_Rule1",DefaultContexts.Save,"PlannedQuantity > 0",CustomMessageTemplate = "Planned quantity must be greater than zero!!")]
+    [RuleCriteria("ProductionOrder_Rule2",DefaultContexts.Save, "TargetStockCard != null", CustomMessageTemplate = "Target Stock Card must be selected!!")]
     public class ProductionOrder : BaseObject
     {
-        private const string CodePrefix = "PO";
+    private const string CodePrefix = "PO";
+        private static int codeNumber = 1;
+
 
         public ProductionOrder(Session session)
             : base(session)
@@ -33,8 +36,9 @@ namespace MiniMes.Module.BusinessObjects
 
             base.AfterConstruction();
             Status = ProductionOrderStatus.Planned;
-            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(ProductionOrder), CodePrefix);
-        }
+            Code = CodePrefix + "-" + codeNumber.ToString("D4");
+            codeNumber++;
+    }
 
         protected override void OnSaving()
         {
@@ -66,8 +70,9 @@ namespace MiniMes.Module.BusinessObjects
         private StockCard targetStockCard;
 
         [RuleRequiredField]
+        [XafDisplayName("Stok Kartı")]
         [Association("StockCard-ProductionOrders")]
-        public StockCard TargetStockCard
+        public StockCard StockCard
         {
             get
             {
@@ -75,7 +80,7 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(nameof(TargetStockCard), ref targetStockCard, value);
+                SetPropertyValue(nameof(StockCard), ref targetStockCard, value);
             }
         }
 

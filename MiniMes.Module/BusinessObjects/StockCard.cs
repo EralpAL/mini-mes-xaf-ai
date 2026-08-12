@@ -14,25 +14,32 @@ using DevExpress.Persistent.Validation;
 using MiniMes.Module.Enums;
 using MiniMes.Module.Services;
 
-namespace MiniMes.Module.BusinessObjects {
+namespace MiniMes.Module.BusinessObjects
+{
     [DefaultClassOptions]
     [NavigationItem("Stock and Warehouse")]
+    //Rule ekle, save işleminde routing boş olamasın
     [DefaultProperty(nameof(Name))]
 
-    public class StockCard : BaseObject { 
+    public class StockCard : BaseObject
+    {
         private const string CodePrefix = "STK";
 
         public StockCard(Session session)
-            : base(session) {
+            : base(session)
+        {
         }
-        public override void AfterConstruction() {
+        public override void AfterConstruction()
+        {
             base.AfterConstruction();
             Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StockCard), CodePrefix);
-    }
+        }
 
-        protected override void OnSaving() {
+        protected override void OnSaving()
+        {
             base.OnSaving();
-            if (string.IsNullOrEmpty(Code)) {
+            if (string.IsNullOrEmpty(Code))
+            {
                 Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StockCard), CodePrefix);
             }
         }
@@ -49,8 +56,6 @@ namespace MiniMes.Module.BusinessObjects {
 
         private string stockName;
         [RuleRequiredField]
-        
-
         public String Name
         {
             get { return stockName; }

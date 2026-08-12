@@ -43,9 +43,7 @@ public class ChangeLanguageController : ViewController
         string currentCulture = CultureInfo.CurrentUICulture.Name;
 
         if (currentCulture == TurkishCulture)
-        {
             return EnglishCulture;
-        }
 
         return TurkishCulture;
     }

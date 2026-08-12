@@ -14,6 +14,11 @@
     <None Remove="Controllers\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Controllers\ProductionOrderApproveController.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Model.DesignedDiffs.xafml" />
     <None Remove="Model.DesignedDiffs.Localization.tr-TR.xafml" />
   </ItemGroup>
