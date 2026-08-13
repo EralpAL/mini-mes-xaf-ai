@@ -82,6 +82,12 @@ namespace MiniMes.Module.BusinessObjects
             get { return GetCollection<RoutingDetail>(nameof(Routings)); }
         }
 
+        [Association("StockCard-RoutingHeaders")]
+        public XPCollection<Routings> RoutingHeaders
+        {
+            get { return GetCollection<Routings>(nameof(RoutingHeaders)); }
+        }
+
         [Association("StockCard-ProductionOrders")]
         public XPCollection<ProductionOrder> ProductionOrders
         {

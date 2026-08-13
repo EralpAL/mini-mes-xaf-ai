@@ -21,6 +21,7 @@ namespace MiniMes.Module.BusinessObjects
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
     [RuleCriteria("ProductionOrder_Rule1",DefaultContexts.Save,"PlannedQuantity > 0",CustomMessageTemplate ="Planned quantity must be greater than zero!!")]
+    [RuleCriteria("ProductionOrder_RoutingMatchesStockCard", DefaultContexts.Save, "Routing is null OR StockCard is null OR Routing.StockCard = StockCard", CustomMessageTemplate = "Seçilen rota, üretim emrinin stok kartına ait olmalıdır.")]
     // Rule 2 sildim stockCard zaten rule ile kontrol ediliyor,
     // ayrıca stockCard boş olamaz çünkü requiredfield attribute var
     public class ProductionOrder : BaseObject
@@ -82,6 +83,23 @@ namespace MiniMes.Module.BusinessObjects
             set
             {
                 SetPropertyValue( nameof(StockCard), ref targetStockCard,value);
+            }
+        }
+
+        private Routings routing;
+
+        [RuleRequiredField]
+        [XafDisplayName("Rota")]
+        [DataSourceCriteria("StockCard = '@This.StockCard'")]
+        public Routings Routing
+        {
+            get
+            {
+                return routing;
+            }
+            set
+            {
+                SetPropertyValue(nameof(Routing), ref routing, value);
             }
         }
 

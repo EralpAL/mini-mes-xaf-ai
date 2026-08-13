@@ -54,6 +54,24 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref routingName, value); }
         }
 
+        private StockCard stockCard;
+        [RuleRequiredField]
+        [Association("StockCard-RoutingHeaders")]
+        public StockCard StockCard
+        {
+            get { return stockCard; }
+            set
+            {
+                if (SetPropertyValue(nameof(StockCard), ref stockCard, value) && !IsLoading && value != null)
+                {
+                    for (int i = 0; i < RoutingDetails.Count; i++)
+                    {
+                        RoutingDetails[i].StockCard = value;
+                    }
+                }
+            }
+        }
+
         [DevExpress.Xpo.Aggregated]
         [Association("Routings-RoutingDetails")]
         public XPCollection<RoutingDetail> RoutingDetails

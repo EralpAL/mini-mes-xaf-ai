@@ -15,6 +15,7 @@ using DevExpress.Persistent.Validation;
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [RuleCombinationOfPropertiesIsUnique("RoutingDetail_UniqueSequenceInRouting", DefaultContexts.Save, "Routings, SequenceNumber", CustomMessageTemplate = "Aynı rota içerisinde iki adım aynı sıra numarasına sahip olamaz.")]
 
     public class RoutingDetail : BaseObject {
         public RoutingDetail(Session session)
@@ -22,6 +23,53 @@ namespace MiniMes.Module.BusinessObjects {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
+            SequenceNumber = 1;
+        }
+
+        protected override void OnSaving() {
+            ApplyRoutingDefaults();
+            base.OnSaving();
+        }
+
+        private void ApplyRoutingDefaults()
+        {
+            if (IsLoading || Routings == null)
+            {
+                return;
+            }
+
+            if (Routings.StockCard != null)
+            {
+                StockCard = Routings.StockCard;
+            }
+
+            int maxSequenceNumber = 0;
+            bool sequenceUsedByOtherDetail = false;
+
+            for (int i = 0; i < Routings.RoutingDetails.Count; i++)
+            {
+                RoutingDetail otherDetail = Routings.RoutingDetails[i];
+
+                if (otherDetail == null || otherDetail == this || otherDetail.IsDeleted)
+                {
+                    continue;
+                }
+
+                if (otherDetail.SequenceNumber > maxSequenceNumber)
+                {
+                    maxSequenceNumber = otherDetail.SequenceNumber;
+                }
+
+                if (otherDetail.SequenceNumber == SequenceNumber)
+                {
+                    sequenceUsedByOtherDetail = true;
+                }
+            }
+
+            if (SequenceNumber <= 0 || sequenceUsedByOtherDetail)
+            {
+                SequenceNumber = maxSequenceNumber + 1;
+            }
         }
 
         private Routings routings;
@@ -30,11 +78,17 @@ namespace MiniMes.Module.BusinessObjects {
         public Routings Routings
         {
             get { return routings; }
-            set { SetPropertyValue(nameof(Routings), ref routings, value); }
+            set
+            {
+                if (SetPropertyValue(nameof(Routings), ref routings, value))
+                {
+                    ApplyRoutingDefaults();
+                }
+            }
         }
 
         private StockCard stockCard;
-        [RuleRequiredField]
+        [RuleRequiredField("RoutingDetail_StockCardRequired", DefaultContexts.Save, TargetCriteria = "Routings is null OR Routings.StockCard is null")]
         [Association("StockCard-Routings")]
         public StockCard StockCard
         {
@@ -52,6 +106,7 @@ namespace MiniMes.Module.BusinessObjects {
         }
 
         private WorkStation workStation;
+        [RuleRequiredField]
         public WorkStation WorkStation
         {
             get { return workStation; }
@@ -59,7 +114,7 @@ namespace MiniMes.Module.BusinessObjects {
         }
 
         private int sequenceNumber;
-        [RuleRange(0, int.MaxValue)]
+        [RuleRange(1, int.MaxValue, CustomMessageTemplate = "SequenceNumber sıfırdan büyük olmalıdır.")]
         public int SequenceNumber
         {
             get { return sequenceNumber; }

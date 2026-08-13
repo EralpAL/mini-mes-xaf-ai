@@ -146,8 +146,10 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         // İş emri başlatılırken seçilen görev.
+        // Eski AssignedRole int kolonu DB'de bırakılır; yeni kolon JobRole.Oid (Guid) ile uyumludur.
         private JobRole assignedRole;
 
+        [Persistent("AssignedJobRole")]
         public JobRole AssignedRole
         {
             get
