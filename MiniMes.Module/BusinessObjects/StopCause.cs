@@ -12,23 +12,45 @@ using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using MiniMes.Module.Enums;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
+    [XafDisplayName("Duruş Nedeni Parametre Tablosu):")]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
     public class StopCause : BaseObject {
+
+        private const string CodePrefix = "STP";
+
         public StopCause(Session session)
-            : base(session) {
+            : base(session)
+        {
         }
-        public override void AfterConstruction() {
+
+        public override void AfterConstruction()
+        {
             base.AfterConstruction();
-            
+
+            Code = BusinessCodeGenerator.GenerateCode( Session,typeof(StopCause),CodePrefix);
+        }
+
+        protected override void OnSaving()
+        {
+            if (string.IsNullOrEmpty(Code))
+            {
+                Code = BusinessCodeGenerator.GenerateCode(Session,typeof(StopCause),CodePrefix);
+            }
+
+            base.OnSaving();
         }
 
         private string stopCauseCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
+
         public string Code
         {
             get { return stopCauseCode; }
@@ -54,6 +76,15 @@ namespace MiniMes.Module.BusinessObjects {
             set
             {
                 SetPropertyValue(nameof(Category), ref category, value);
+            }
+        }
+
+        [Association("StopCause-DowntimeLogs")]
+        public XPCollection<DowntimeLog> DowntimeLogs
+        {
+            get
+            {
+                return GetCollection<DowntimeLog>(nameof(DowntimeLogs));
             }
         }
 

@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Application>
+  <BOModel>
+    <Class Name="DevExpress.Persistent.BaseImpl.PermissionPolicy.PermissionPolicyUser" Caption="Temel Kullanıcı" />
+    <Class Name="MiniMes.Module.BusinessObjects.Warehouse" Caption="Depo">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="StockCards" Caption="Stok Kartları" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.StockCard" Caption="Stok Kartı">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="StockType" Caption="Stok Tipi" />
+        <Member Name="Warehouse" Caption="Depo" />
+        <Member Name="Routings" Caption="Rota Adımları" />
+        <Member Name="ProductionOrders" Caption="Üretim Emirleri" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.WorkStation" Caption="İş İstasyonu">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="HourlyCost" Caption="Saatlik Maliyet" />
+        <Member Name="IsActive" Caption="Aktif" />
+        <Member Name="Equipments" Caption="Ekipmanlar" />
+        <Member Name="Employees" Caption="Personeller" />
+        <Member Name="MaintenanceLogs" Caption="Bakım Kayıtları" />
+        <Member Name="Downtimes" Caption="Duruşlar" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.Equipment" Caption="Ekipman">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="IsActive" Caption="Aktif" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.StopCause" Caption="Duruş Nedeni">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="Category" Caption="Kategori" />
+        <Member Name="DowntimeLogs" Caption="Duruş Kayıtları" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.Employee" Caption="Personel">
+      <OwnMembers>
+        <Member Name="RegistrationNumber" Caption="Sicil Numarası" />
+        <Member Name="FullName" Caption="Ad Soyad" />
+        <Member Name="Role" Caption="Görev" />
+        <Member Name="AssignedShift" Caption="Atanan Vardiya" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+        <Member Name="ProductionEntries" Caption="Üretim Girişleri" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.Shift" Caption="Vardiya">
+      <OwnMembers>
+        <Member Name="ShiftName" Caption="Vardiya Adı" />
+        <Member Name="ShiftTime" Caption="Başlangıç Zamanı" />
+        <Member Name="EndTime" Caption="Bitiş Zamanı" />
+        <Member Name="IsActive" Caption="Aktif" />
+        <Member Name="Employees" Caption="Personeller" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.Operation" Caption="Operasyon">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="Description" Caption="Açıklama" />
+        <Member Name="IsActive" Caption="Aktif" />
+        <Member Name="Routings" Caption="Rota Adımları" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.Routings" Caption="Rota">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="Name" Caption="Ad" />
+        <Member Name="RoutingDetails" Caption="Rota Adımları" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.RoutingDetail" Caption="Rota Adımı">
+      <OwnMembers>
+        <Member Name="Routings" Caption="Rota" />
+        <Member Name="StockCard" Caption="Stok Kartı" />
+        <Member Name="Operation" Caption="Operasyon" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+        <Member Name="SequenceNumber" Caption="Sıra Numarası" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.ProductionOrder" Caption="Üretim Emri">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="TargetStockCard" Caption="Hedef Stok Kartı" />
+        <Member Name="PlannedQuantity" Caption="Planlanan Miktar" />
+        <Member Name="ProducedQuantity" Caption="Üretilen Miktar" />
+        <Member Name="Status" Caption="Durum" />
+        <Member Name="AiDelayAnalysis" Caption="Yapay Zeka Gecikme Analizi" />
+        <Member Name="AiOptimizationRecommendation" Caption="Yapay Zeka Optimizasyon Önerisi" />
+        <Member Name="WorkOrders" Caption="İş Emirleri" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.WorkOrder" Caption="İş Emri">
+      <OwnMembers>
+        <Member Name="Code" Caption="Kod" />
+        <Member Name="SequenceNumber" Caption="Sıra Numarası" />
+        <Member Name="ProductionOrder" Caption="Üretim Emri" />
+        <Member Name="AssignedWorkStation" Caption="Atanan İş İstasyonu" />
+        <Member Name="Operation" Caption="Operasyon" />
+        <Member Name="AssignedEmployee" Caption="Atanan Personel" />
+        <Member Name="Status" Caption="Durum" />
+        <Member Name="ProducedQuantity" Caption="Üretilen Miktar" />
+        <Member Name="ScrapQuantity" Caption="Fire Miktarı" />
+        <Member Name="ProductionEntries" Caption="Üretim Girişleri" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.ProductionEntry" Caption="Üretim Girişi">
+      <OwnMembers>
+        <Member Name="WorkOrder" Caption="İş Emri" />
+        <Member Name="Operator" Caption="Operatör" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+        <Member Name="RealizedAmount" Caption="Gerçekleşen Miktar" />
+        <Member Name="ScrapAmount" Caption="Fire Miktarı" />
+        <Member Name="ScrapReason" Caption="Fire Nedeni" />
+        <Member Name="StartTime" Caption="Başlangıç Zamanı" />
+        <Member Name="EndTime" Caption="Bitiş Zamanı" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.DowntimeLog" Caption="Duruş Kaydı">
+      <OwnMembers>
+        <Member Name="StartTime" Caption="Başlangıç Zamanı" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+        <Member Name="WorkOrder" Caption="İş Emri" />
+        <Member Name="StopCause" Caption="Duruş Nedeni" />
+        <Member Name="Operator" Caption="Operatör" />
+        <Member Name="DurationMinutes" Caption="Süre (Dakika)" />
+        <Member Name="Description" Caption="Açıklama" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.MaintenanceLog" Caption="Bakım Kaydı">
+      <OwnMembers>
+        <Member Name="MaintenanceDate" Caption="Bakım Tarihi" />
+        <Member Name="WorkStation" Caption="İş İstasyonu" />
+        <Member Name="Equipment" Caption="Ekipman" />
+        <Member Name="Technician" Caption="Teknisyen" />
+        <Member Name="MaintenanceType" Caption="Bakım Tipi" />
+        <Member Name="Cost" Caption="Maliyet" />
+      </OwnMembers>
+    </Class>
+  </BOModel>
+  <NavigationItems>
+    <Items>
+      <Item Id="Stock and Warehouse" Caption="Stok ve Depo" />
+      <Item Id="Production Definitions" Caption="Üretim Tanımları" />
+      <Item Id="Personnel and Shifts" Caption="Personel ve Vardiyalar" />
+      <Item Id="Production Operations" Caption="Üretim İşlemleri" />
+    </Items>
+  </NavigationItems>
+  <ActionDesign>
+    <Actions>
+      <Action Id="New" Caption="Yeni" />
+      <Action Id="Delete" Caption="Sil" />
+      <Action Id="Save" Caption="Kaydet" />
+      <Action Id="SaveAndClose" Caption="Kaydet ve Kapat" />
+      <Action Id="SaveAndNew" Caption="Kaydet ve Yeni" />
+      <Action Id="Edit" Caption="Düzenle" />
+      <Action Id="Refresh" Caption="Yenile" />
+      <Action Id="Approve" Caption="Onayla" ToolTip="Hedef ürünün rotasındaki iş emirlerini oluşturur ve emri başlatır." ConfirmationMessage="Bu üretim emrini onaylamak ve iş emirlerini oluşturmak istediğinize emin misiniz?" />
+      <Action Id="CompleteProductionOrder" Caption="Tamamla" ToolTip="Emri ve açık iş emirlerini kapatır." ConfirmationMessage="Bu üretim emrini tamamlamak istediğinize emin misiniz?" />
+      <Action Id="CancelProductionOrder" Caption="Emri İptal Et" ToolTip="Emri ve tamamlanmamış iş emirlerini iptal eder." ConfirmationMessage="Bu üretim emrini iptal etmek istediğinize emin misiniz?" />
+    </Actions>
+  </ActionDesign>
+  <Validation>
+    <Rules>
+      <RuleCriteria Id="ProductionOrder_PlannedQuantityGreaterThanZero" CustomMessageTemplate="Planlanan miktar sıfırdan büyük olmalıdır." />
+      <RuleCriteria Id="ProductionEntry_QuantityEntered" CustomMessageTemplate="Gerçekleşen miktar, fire miktarı veya her ikisi girilmelidir." />
+      <RuleCriteria Id="ProductionEntry_ScrapReasonRequired" CustomMessageTemplate="Fire miktarı girildiğinde fire nedeni belirtilmelidir." />
+      <RuleCriteria Id="DowntimeLog_DurationGreaterThanZero" CustomMessageTemplate="Duruş süresi sıfır dakikadan büyük olmalıdır." />
+      <RuleValueComparison Id="ProductionEntry_EndTimeNotBeforeStartTime" CustomMessageTemplate="Bitiş zamanı başlangıç zamanından önce olamaz." />
+    </Rules>
+  </Validation>
+  <Views>
+    <ListView Id="ApplicationUser_ListView" Caption="Kullanıcılar" />
+  </Views>
+  <Localization>
+    <LocalizationGroup Name="Enums">
+      <LocalizationGroup Name="MiniMes.Module.Enums.EnumStockType">
+        <LocalizationItem Name="RawMaterial" Value="Hammadde" />
+        <LocalizationItem Name="SemiFinished" Value="Yarı Mamul" />
+        <LocalizationItem Name="FinishedProduct" Value="Mamul" />
+        <LocalizationItem Name="Scrap" Value="Hurda" />
+        <LocalizationItem Name="SparePart" Value="Yedek Parça" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MiniMes.Module.Enums.EnumEmployeeRole">
+        <LocalizationItem Name="Operator" Value="Operatör" />
+        <LocalizationItem Name="ShiftLeader" Value="Vardiya Amiri" />
+        <LocalizationItem Name="QualityInspector" Value="Kalite Kontrolcü" />
+        <LocalizationItem Name="MaintenanceEngineer" Value="Bakım Mühendisi" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MiniMes.Module.Enums.StopCategory">
+        <LocalizationItem Name="Planned" Value="Planlı" />
+        <LocalizationItem Name="Unplanned" Value="Plansız" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MiniMes.Module.Enums.ProductionOrderStatus">
+        <LocalizationItem Name="Planned" Value="Planlandı" />
+        <LocalizationItem Name="InProgress" Value="Devam Ediyor" />
+        <LocalizationItem Name="Completed" Value="Tamamlandı" />
+        <LocalizationItem Name="Canceled" Value="İptal Edildi" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MiniMes.Module.Enums.WorkOrderStatus">
+        <LocalizationItem Name="Planned" Value="Planlandı" />
+        <LocalizationItem Name="InProgress" Value="Devam Ediyor" />
+        <LocalizationItem Name="Completed" Value="Tamamlandı" />
+        <LocalizationItem Name="Canceled" Value="İptal Edildi" />
+      </LocalizationGroup>
+      <LocalizationGroup Name="MiniMes.Module.Enums.MaintenanceType">
+        <LocalizationItem Name="Preventive" Value="Önleyici" />
+        <LocalizationItem Name="Corrective" Value="Düzeltici" />
+        <LocalizationItem Name="Inspection" Value="Muayene" />
+      </LocalizationGroup>
+    </LocalizationGroup>
+  </Localization>
+</Application>

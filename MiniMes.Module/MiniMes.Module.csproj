@@ -14,10 +14,23 @@
     <None Remove="Controllers\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Remove="Controllers\ProductionOrderApproveController.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Model.DesignedDiffs.xafml" />
+    <None Remove="Model.DesignedDiffs.Localization.tr-TR.xafml" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
+    <!-- WithCulture/LogicalName keep MSBuild from reading the "tr-TR" part of the file name as a
+         culture and moving the model aspect into a satellite assembly. XAF looks the file up as
+         a resource of this assembly. -->
+    <EmbeddedResource Include="Model.DesignedDiffs.Localization.tr-TR.xafml">
+      <WithCulture>false</WithCulture>
+      <LogicalName>MiniMes.Module.Model.DesignedDiffs.Localization.tr-TR.xafml</LogicalName>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DevExpress.ExpressApp" Version="24.1.7" />

@@ -1,86 +1,66 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using DevExpress.Xpo;
-using DevExpress.ExpressApp;
-using System.ComponentModel;
-using DevExpress.ExpressApp.DC;
-using DevExpress.Data.Filtering;
+﻿using DevExpress.ExpressApp;
 using DevExpress.Persistent.Base;
-using System.Collections.Generic;
-using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
-using MiniMes.Module.Enums;
+using DevExpress.Xpo;
+using System.ComponentModel;
 
-namespace MiniMes.Module.BusinessObjects {
+namespace MiniMes.Module.BusinessObjects
+{
     [DefaultClassOptions]
     [NavigationItem("Personnel and Shifts")]
-    public class Employee : BaseObject { 
+    [DefaultProperty(nameof(FullName))]
+    public class Employee : BaseObject
+    {
         public Employee(Session session)
-            : base(session) {
+            : base(session)
+        {
         }
-        public override void AfterConstruction() {
+
+        public override void AfterConstruction()
+        {
             base.AfterConstruction();
-            
         }
+
         private string registrationNumber;
+
         [RuleRequiredField]
-        
+        [RuleUniqueValue]
         public string RegistrationNumber
         {
-            get { return registrationNumber; }
-            set { SetPropertyValue(nameof(RegistrationNumber), ref registrationNumber, value); }
+            get
+            {
+                return registrationNumber;
+            }
+            set
+            {
+                SetPropertyValue(nameof(RegistrationNumber),ref registrationNumber,value);
+            }
         }
 
-        private string employeeName;
+        private string fullName;
+
         [RuleRequiredField]
-        public String Name
-        {
-            get { return employeeName; }
-            set { SetPropertyValue(nameof(Name), ref employeeName, value); }
-        }
-
-
-        private EmployeeRole role;
-        public EmployeeRole Role
-        {
-            get { return role; }
-            set { SetPropertyValue(nameof(Role), ref role, value); }
-        }
-
-        private Shift assignedShift;
-
-        [Association("Shift-Employees")]
-        public Shift AssignedShift
+        public string FullName
         {
             get
             {
-                return assignedShift;
+                return fullName;
             }
             set
             {
-                SetPropertyValue(nameof(AssignedShift), ref assignedShift, value);
+                SetPropertyValue( nameof(FullName),ref fullName,value);
             }
         }
 
-        private WorkStation workStation;
-
-        [Association("WorkStation-Employees")]
-        public WorkStation WorkStation
+        [Association("Employee-ProductionEntries")]
+        public XPCollection<ProductionEntry> ProductionEntries
         {
             get
             {
-                return workStation;
-            }
-            set
-            {
-                SetPropertyValue(nameof(WorkStation), ref workStation, value);
+                return GetCollection<ProductionEntry>(
+                    nameof(ProductionEntries));
             }
         }
-
-
-
     }
-
-    }
+}

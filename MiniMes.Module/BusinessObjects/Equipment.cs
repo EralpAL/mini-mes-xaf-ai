@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using DevExpress.Xpo;
@@ -17,48 +17,50 @@ namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
     [DefaultProperty(nameof(Name))]
-    public class Operation : BaseObject { 
-        private const string CodePrefix = "OP";
 
-        public Operation(Session session)
+    public class Equipment : BaseObject { 
+        private const string CodePrefix = "EQ";
+
+        public Equipment(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
             IsActive = true;
-            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Equipment), CodePrefix);
         }
 
         protected override void OnSaving() {
             base.OnSaving();
             if (string.IsNullOrEmpty(Code)) {
-                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Equipment), CodePrefix);
             }
         }
 
-        private string operationCode;
+        private WorkStation workStation;
+        [Association("WorkStation-Equipments")]
+        public WorkStation WorkStation
+        {
+            get { return workStation; }
+            set { SetPropertyValue(nameof(WorkStation), ref workStation, value); }
+        }
+
+        private string equipmentCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
         [ModelDefault("AllowEdit", "False")]
         public string Code
         {
-            get { return operationCode; }
-            set { SetPropertyValue(nameof(Code), ref operationCode, value); }
+            get { return equipmentCode; }
+            set { SetPropertyValue(nameof(Code), ref equipmentCode, value); }
         }
 
-        private string operationName;
+        private string equipmentName;
         [RuleRequiredField]
-        public String Name
+        public string Name
         {
-            get { return operationName; }
-            set { SetPropertyValue(nameof(Name), ref operationName, value); }
-        }
-
-        private string description;
-        public string Description
-        {
-            get { return description; }
-            set { SetPropertyValue(nameof(Description), ref description, value); }
+            get { return equipmentName; }
+            set { SetPropertyValue(nameof(Name), ref equipmentName, value); }
         }
 
         private bool isActive;
@@ -68,10 +70,5 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(IsActive), ref isActive, value); }
         }
 
-        [Association("Operation-Routings")]
-        public XPCollection<RoutingDetail> Routings
-        {
-            get { return GetCollection<RoutingDetail>(nameof(Routings)); }
-        }
     }
 }
