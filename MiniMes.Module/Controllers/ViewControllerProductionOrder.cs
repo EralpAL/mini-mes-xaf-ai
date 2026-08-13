@@ -18,7 +18,7 @@ namespace MiniMes.Module.Controllers
         protected override void OnActivated()
         {
             base.OnActivated();
-          
+
         }
 
         protected override void OnViewControlsCreated()
@@ -31,34 +31,57 @@ namespace MiniMes.Module.Controllers
             base.OnDeactivated();
         }
 
-        private void ProductionOrder_Approve_Execute(object sender, SimpleActionExecuteEventArgs e)
+        private void ProductionOrder_Approve_Execute(
+     object sender,
+     SimpleActionExecuteEventArgs e)
         {
-            ProductionOrder productionOrder = e.CurrentObject as ProductionOrder;
+            ProductionOrder productionOrder =
+                e.CurrentObject as ProductionOrder;
 
             if (productionOrder == null)
+            {
                 return;
+            }
 
-            XPCollection<RoutingDetail> routingDetails = new XPCollection<RoutingDetail>(productionOrder.Session, CriteriaOperator.Parse("StockCard = ?", productionOrder.StockCard));
+            if (productionOrder.StockCard == null)
+            {
+                throw new UserFriendlyException("Üretim emrinde stok kartı seçilmelidir.");
+            }
+
+            XPCollection<RoutingDetail> routingDetails =new XPCollection<RoutingDetail>(productionOrder.Session,CriteriaOperator.Parse("StockCard = ?",productionOrder.StockCard));
+
+            if (routingDetails.Count == 0)
+            {
+                throw new UserFriendlyException( "Bu stok kartına bağlı rota adımı bulunamadı.");
+            }
 
             int workOrderNumber = 1;
 
             foreach (RoutingDetail routingDetail in routingDetails)
             {
-                WorkOrder workOrder = new WorkOrder(productionOrder.Session);
+                if (routingDetail.Operation == null ||
+                    routingDetail.WorkStation == null)
+                {
+                    throw new UserFriendlyException("Rota adımlarında operasyon ve iş istasyonu seçilmelidir.");
+                }
+
+                WorkOrder workOrder =ObjectSpace.CreateObject<WorkOrder>();
 
                 workOrder.ProductionOrder = productionOrder;
                 workOrder.Code = productionOrder.Code + "-" + workOrderNumber.ToString("000");
+
                 workOrder.SequenceNumber = routingDetail.SequenceNumber;
-                workOrder.Operation = routingDetail.Operation;
+
+                workOrder.Operation =   routingDetail.Operation;
+
                 workOrder.AssignedWorkStation = routingDetail.WorkStation;
+
                 workOrder.Status = WorkOrderStatus.Planned;
 
-                workOrder.Save();
                 workOrderNumber++;
             }
 
             productionOrder.Status = ProductionOrderStatus.InProgress;
-            productionOrder.Save();
 
             ObjectSpace.CommitChanges();
             View.ObjectSpace.Refresh();

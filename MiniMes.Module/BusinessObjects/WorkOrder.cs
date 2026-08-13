@@ -1,5 +1,6 @@
 ﻿using DevExpress.Data.Filtering;
 using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.ConditionalAppearance;
 using DevExpress.ExpressApp.DC;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
@@ -8,11 +9,7 @@ using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 using MiniMes.Module.Enums;
 using MiniMes.Module.Services;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace MiniMes.Module.BusinessObjects
 {
@@ -20,6 +17,7 @@ namespace MiniMes.Module.BusinessObjects
     [XafDisplayName("İş Emri")]
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
+    [Appearance("Appearance-1", AppearanceItemType.Action, "1=1", TargetItems ="New", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide )]
     
     public class WorkOrder : BaseObject
     {
@@ -144,6 +142,41 @@ namespace MiniMes.Module.BusinessObjects
             set
             {
                 SetPropertyValue(nameof(AssignedEmployee), ref assignedEmployee, value);
+            }
+        }
+
+        // İş emri başlatılırken seçilen görev.
+        private JobRole assignedRole;
+
+        public JobRole AssignedRole
+        {
+            get
+            {
+                return assignedRole;
+            }
+            set
+            {
+                SetPropertyValue(
+                    nameof(AssignedRole),
+                    ref assignedRole,
+                    value);
+            }
+        }
+
+        private Shift assignedShift;
+
+        public Shift AssignedShift
+        {
+            get
+            {
+                return assignedShift;
+            }
+            set
+            {
+                SetPropertyValue(
+                    nameof(AssignedShift),
+                    ref assignedShift,
+                    value);
             }
         }
 

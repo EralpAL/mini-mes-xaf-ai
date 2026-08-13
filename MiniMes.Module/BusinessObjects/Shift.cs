@@ -18,7 +18,7 @@ namespace MiniMes.Module.BusinessObjects
     [NavigationItem("Personnel and Shifts")]
     [DefaultProperty(nameof(ShiftName))]
     public class Shift : BaseObject
-    { 
+    {
         public Shift(Session session)
             : base(session)
         {
@@ -61,7 +61,7 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         private TimeSpan endTime;
-        
+
         public TimeSpan EndTime
         {
             get
@@ -73,7 +73,7 @@ namespace MiniMes.Module.BusinessObjects
                 SetPropertyValue(nameof(EndTime), ref endTime, value);
             }
         }
-    
+
         private bool isActive;
 
         public bool IsActive
@@ -87,19 +87,6 @@ namespace MiniMes.Module.BusinessObjects
                 SetPropertyValue(nameof(IsActive), ref isActive, value);
             }
         }
-
-        [Association("Shift-Employees")]
-        public XPCollection<Employee> Employees
-        {
-            get
-            {
-                return GetCollection<Employee>(nameof(Employees));
-            }
-        }
-
-
-
-
 
 
     }

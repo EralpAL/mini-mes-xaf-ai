@@ -15,7 +15,7 @@ using System.Text;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
-    [XafDisplayName("Üretim Giriþi & Fire Kaydý")]
+    [XafDisplayName("ï¿½retim Giriï¿½i & Fire Kaydï¿½")]
     [NavigationItem("Production Operations")]
     [RuleCriteria("ProductionEntry_QuantityEntered", DefaultContexts.Save, "RealizedAmount + ScrapAmount > 0", CustomMessageTemplate = "Enter a realized quantity, a scrap quantity, or both.")]
     public class ProductionEntry : BaseObject
@@ -44,7 +44,7 @@ namespace MiniMes.Module.BusinessObjects
             set
             {
 
-                // Ýþ emri deðiþtiðinde istasyonu ve eski-yeni iþ emirlerinin toplamlarýný günceller.
+                // ï¿½ï¿½ emri deï¿½iï¿½tiï¿½inde istasyonu ve eski-yeni iï¿½ emirlerinin toplamlarï¿½nï¿½ gï¿½nceller.
                 WorkOrder previousWorkOrder = workOrder;
                 if (!SetPropertyValue(nameof(WorkOrder), ref workOrder, value) || IsLoading || IsSaving)
                 {
@@ -192,7 +192,7 @@ namespace MiniMes.Module.BusinessObjects
 
             if (ScrapAmount > 0)
 
-            //ScrapReason boþ, null veya yalnýzca boþluklardan oluþuyorsa:
+            //ScrapReason boï¿½, null veya yalnï¿½zca boï¿½luklardan oluï¿½uyorsa:
             {
                 if (string.IsNullOrWhiteSpace(ScrapReason))
                 {
@@ -200,7 +200,7 @@ namespace MiniMes.Module.BusinessObjects
                 }
             }
 
-            // Ýþ emrine baðlýysa toplamlarý baþtan hesaplar.
+            // ï¿½ï¿½ emrine baï¿½lï¿½ysa toplamlarï¿½ baï¿½tan hesaplar.
             if (WorkOrder != null)
             {
                 WorkOrder.RecalculateTotals();
@@ -212,7 +212,7 @@ namespace MiniMes.Module.BusinessObjects
             WorkOrder affectedWorkOrder = WorkOrder;
             base.OnDeleting();
 
-            //Silinen üretim giriþini hesaba katmadan eski iþ emrinin toplamlarýný yeniden hesaplar.
+            //Silinen ï¿½retim giriï¿½ini hesaba katmadan eski iï¿½ emrinin toplamlarï¿½nï¿½ yeniden hesaplar.
             if (affectedWorkOrder != null)
             {
                 affectedWorkOrder.RecalculateTotals(this);

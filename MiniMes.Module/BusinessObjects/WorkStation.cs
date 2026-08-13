@@ -76,15 +76,6 @@ namespace MiniMes.Module.BusinessObjects {
         }
 
 
-        [Association("WorkStation-Employees")]
-        public XPCollection<Employee> Employees
-        {
-            get
-            {
-                return GetCollection<Employee>(nameof(Employees));
-            }
-        }
-
         [Association("WorkStation-MaintenanceLogs")]
         public XPCollection<MaintenanceLog> MaintenanceLogs
         {
@@ -95,11 +86,11 @@ namespace MiniMes.Module.BusinessObjects {
         }
 
         [Association("WorkStation-Downtimes")]
-        public XPCollection<DowntimeLog> Downtimes
+        public XPCollection<DowntimeLog> Downtime
         {
             get
             {
-                return GetCollection<DowntimeLog>(nameof(Downtimes));
+                return GetCollection<DowntimeLog>(nameof(Downtime));
             }
         }
 
