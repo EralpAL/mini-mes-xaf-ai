@@ -34,8 +34,7 @@ namespace MiniMes.Module.Controllers
             object sender,
             SimpleActionExecuteEventArgs e)
         {
-            ProductionOrder productionOrder =
-                e.CurrentObject as ProductionOrder;
+            ProductionOrder productionOrder = e.CurrentObject as ProductionOrder;
 
             if (productionOrder == null)
             {
@@ -80,8 +79,7 @@ namespace MiniMes.Module.Controllers
 
             productionOrder.Routing.RoutingDetails.Reload();
 
-            IList<RoutingDetail> loadedDetails = ObjectSpace.GetObjects<RoutingDetail>(
-                CriteriaOperator.Parse("Routings = ?", productionOrder.Routing));
+            IList<RoutingDetail> loadedDetails = ObjectSpace.GetObjects<RoutingDetail>( CriteriaOperator.Parse("Routings = ?", productionOrder.Routing));
 
             List<RoutingDetail> orderedDetails = new List<RoutingDetail>();
 

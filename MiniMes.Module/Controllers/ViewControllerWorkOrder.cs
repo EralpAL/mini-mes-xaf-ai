@@ -31,7 +31,6 @@ namespace MiniMes.Module.Controllers
         protected override void OnActivated()
         {
             base.OnActivated();
-            //View.AllowNew["ManualWorkOrderCreationDisabled"] = false;
         }
 
         protected override void OnViewControlsCreated()
@@ -44,23 +43,20 @@ namespace MiniMes.Module.Controllers
             base.OnDeactivated();
         }
 
-        private void WorkOrder_Start_CustomizePopupWindowParams(object sender,CustomizePopupWindowParamsEventArgs e)
+        private void WorkOrder_Start_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
         {
-            IObjectSpace popupObjectSpace =Application.CreateObjectSpace(typeof(NonPersistentObject));
+            IObjectSpace popupObjectSpace = Application.CreateObjectSpace(typeof(NonPersistentObject));
 
-            NonPersistentObject parameters =popupObjectSpace.CreateObject<NonPersistentObject>();
+            NonPersistentObject parameters = popupObjectSpace.CreateObject<NonPersistentObject>();
 
-            DetailView detailView =
-                Application.CreateDetailView( popupObjectSpace, parameters);
+            DetailView detailView = Application.CreateDetailView(popupObjectSpace, parameters);
 
             detailView.ViewEditMode = ViewEditMode.Edit;
 
             e.View = detailView;
         }
 
-        private void WorkOrder_Start_Execute(
-     object sender,
-     PopupWindowShowActionExecuteEventArgs e)
+        private void WorkOrder_Start_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
         {
             NonPersistentObject parameters = e.PopupWindowViewCurrentObject as NonPersistentObject;
 
@@ -85,21 +81,18 @@ namespace MiniMes.Module.Controllers
             }
 
             Employee selectedEmployee = ObjectSpace.GetObject(parameters.SelectedEmployee);
-
             JobRole selectedRole = ObjectSpace.GetObject(parameters.SelectedRole);
-
             Shift selectedShift = ObjectSpace.GetObject(parameters.SelectedShift);
 
             if (selectedEmployee == null || selectedRole == null || selectedShift == null)
             {
-                throw new UserFriendlyException( "Seçilen çalışan, görev veya vardiya bulunamadı.");
+                throw new UserFriendlyException("Seçilen çalışan, görev veya vardiya bulunamadı.");
             }
 
             // Önce seçilen bütün iş emirlerini kontrol eder.
             for (int i = 0; i < e.SelectedObjects.Count; i++)
             {
-                WorkOrder workOrder =
-                    e.SelectedObjects[i] as WorkOrder;
+                WorkOrder workOrder = e.SelectedObjects[i] as WorkOrder;
 
                 if (workOrder == null || workOrder.Status != WorkOrderStatus.Planned)
                 {
@@ -110,8 +103,7 @@ namespace MiniMes.Module.Controllers
             // Seçilen bilgileri iş emirlerine aktarır ve emirleri başlatır.
             for (int i = 0; i < e.SelectedObjects.Count; i++)
             {
-                WorkOrder workOrder =
-                    e.SelectedObjects[i] as WorkOrder;
+                WorkOrder workOrder = e.SelectedObjects[i] as WorkOrder;
 
                 workOrder.AssignedEmployee = selectedEmployee;
                 workOrder.AssignedRole = selectedRole;
@@ -123,9 +115,7 @@ namespace MiniMes.Module.Controllers
             View.ObjectSpace.Refresh();
         }
 
-        private void WorkOrder_Stop_Execute(
-            object sender,
-            SimpleActionExecuteEventArgs e)
+        private void WorkOrder_Stop_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
             WorkOrder workOrder = e.CurrentObject as WorkOrder;
 
@@ -144,12 +134,20 @@ namespace MiniMes.Module.Controllers
             ObjectSpace.CommitChanges();
             View.ObjectSpace.Refresh();
         }
-        private void WorkOrder_Continue_Execute( object sender,SimpleActionExecuteEventArgs e)
+
+        private void WorkOrder_Continue_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
             WorkOrder workOrder = e.CurrentObject as WorkOrder;
 
             if (workOrder == null)
+            {
                 return;
+            }
+
+            if (workOrder.Status != WorkOrderStatus.Stopped)
+            {
+                throw new UserFriendlyException("Yalnızca durdurulan iş emirlerine devam edilebilir.");
+            }
 
             workOrder.Status = WorkOrderStatus.InProgress;
 
@@ -157,17 +155,23 @@ namespace MiniMes.Module.Controllers
             View.ObjectSpace.Refresh();
         }
 
-        private void WorkOrder_Finish_Execute(
-            object sender,SimpleActionExecuteEventArgs e)
+        private void WorkOrder_Finish_Execute(object sender, SimpleActionExecuteEventArgs e)
         {
             WorkOrder workOrder = e.CurrentObject as WorkOrder;
 
             if (workOrder == null)
+            {
                 return;
+            }
+
+            if (workOrder.Status != WorkOrderStatus.InProgress)
+            {
+                throw new UserFriendlyException("Yalnızca devam eden iş emirleri tamamlanabilir.");
+            }
 
             workOrder.Status = WorkOrderStatus.Completed;
 
-            // Üretim emrinin tüm iş emirleri tamamlandıysa üretim emrini de tamamla.
+            // Üretim emrinin tüm iş emirleri tamamlandıysa üretim emrini de tamamlar.
             ProductionOrder productionOrder = workOrder.ProductionOrder;
 
             if (productionOrder != null)
@@ -177,7 +181,7 @@ namespace MiniMes.Module.Controllers
 
                 for (int i = 0; i < productionOrder.WorkOrders.Count; i++)
                 {
-                    WorkOrder relatedWorkOrder =productionOrder.WorkOrders[i];
+                    WorkOrder relatedWorkOrder = productionOrder.WorkOrders[i];
 
                     if (relatedWorkOrder.IsDeleted)
                     {
@@ -186,7 +190,7 @@ namespace MiniMes.Module.Controllers
 
                     hasWorkOrders = true;
 
-                    if (relatedWorkOrder.Status !=WorkOrderStatus.Completed)
+                    if (relatedWorkOrder.Status != WorkOrderStatus.Completed)
                     {
                         allWorkOrdersCompleted = false;
                         break;
@@ -195,14 +199,59 @@ namespace MiniMes.Module.Controllers
 
                 if (hasWorkOrders && allWorkOrdersCompleted)
                 {
-                    productionOrder.Status =ProductionOrderStatus.Completed;
+                    productionOrder.Status = ProductionOrderStatus.Completed;
                 }
             }
 
             ObjectSpace.CommitChanges();
             View.ObjectSpace.Refresh();
         }
+
+        private void WorkOrder_ProductionEntry_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
+        {
+            WorkOrder workOrder = View.CurrentObject as WorkOrder;
+
+
+            if (workOrder.AssignedWorkStation == null)
+            {
+                throw new UserFriendlyException("Üretim girişi yapabilmek için iş emrine iş istasyonu atanmış olmalıdır.");
+            }
+
+            IObjectSpace popupObjectSpace = Application.CreateObjectSpace(typeof(ProductionEntryParameters));
+            ProductionEntryParameters parameters = popupObjectSpace.CreateObject<ProductionEntryParameters>();
+            DetailView detailView = Application.CreateDetailView(popupObjectSpace, parameters);
+            detailView.ViewEditMode = ViewEditMode.Edit;
+            e.View = detailView;
+        }
+
+        private void WorkOrder_ProductionEntry_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+
+            if (workOrder.AssignedWorkStation == null)
+            {
+                throw new UserFriendlyException("Üretim girişi yapabilmek için iş emrine iş istasyonu atanmış olmalıdır.");
+            }
+
+            ProductionEntryParameters parameters = e.PopupWindowViewCurrentObject as ProductionEntryParameters;
+
+            if (parameters == null)
+            {
+                throw new UserFriendlyException("Üretim giriş bilgileri alınamadı.");
+            }
+
+            ProductionEntry productionEntry = ObjectSpace.CreateObject<ProductionEntry>();
+
+            productionEntry.WorkOrder = workOrder;
+            productionEntry.Operator = workOrder.AssignedEmployee;
+            productionEntry.WorkStation = workOrder.AssignedWorkStation;
+            productionEntry.RealizedAmount = parameters.RealizedAmount;
+           
+
+            ObjectSpace.CommitChanges();
+            ObjectSpace.Refresh();
+
+            Application.ShowViewStrategy.ShowMessage("Üretim miktarı başarıyla kaydedildi.",InformationType.Success);
+        }
     }
-
-
 }

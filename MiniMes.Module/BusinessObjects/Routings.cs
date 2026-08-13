@@ -31,8 +31,7 @@ namespace MiniMes.Module.BusinessObjects {
 
         protected override void OnSaving() {
             base.OnSaving();
-            if (string.IsNullOrEmpty(Code)) {
-                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Routings), CodePrefix);
+            if (string.IsNullOrEmpty(Code)) {Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Routings), CodePrefix);
             }
         }
 

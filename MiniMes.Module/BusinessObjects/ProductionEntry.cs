@@ -1,6 +1,8 @@
 using DevExpress.Data.Filtering;
 using DevExpress.ExpressApp;
+using DevExpress.ExpressApp.ConditionalAppearance;
 using DevExpress.ExpressApp.DC;
+using DevExpress.ExpressApp.Editors;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl;
@@ -14,12 +16,13 @@ using System.Text;
 
 namespace MiniMes.Module.BusinessObjects
 {
-    [DefaultClassOptions]
-    [XafDisplayName("�retim Giri�i & Fire Kayd�")]
-    [NavigationItem("Production Operations")]
-    [RuleCriteria("ProductionEntry_QuantityEntered", DefaultContexts.Save, "RealizedAmount + ScrapAmount > 0", CustomMessageTemplate = "Enter a realized quantity, a scrap quantity, or both.")]
+
+    [NavigationItem(false)]
+    [Appearance("ProductionEntry_HideNew",AppearanceItemType.Action,"1=1",TargetItems = "New",Visibility = ViewItemVisibility.Hide)]
+    [XafDisplayName("Üretim Girişi")]
+
     public class ProductionEntry : BaseObject
-    { 
+    {
         public ProductionEntry(Session session)
             : base(session)
         {
@@ -27,8 +30,6 @@ namespace MiniMes.Module.BusinessObjects
         public override void AfterConstruction()
         {
             base.AfterConstruction();
-            StartTime = DateTime.Now;
-            EndTime = DateTime.Now;
         }
 
         private WorkOrder workOrder;
@@ -44,7 +45,6 @@ namespace MiniMes.Module.BusinessObjects
             set
             {
 
-                // �� emri de�i�ti�inde istasyonu ve eski-yeni i� emirlerinin toplamlar�n� g�nceller.
                 WorkOrder previousWorkOrder = workOrder;
                 if (!SetPropertyValue(nameof(WorkOrder), ref workOrder, value) || IsLoading || IsSaving)
                 {
@@ -105,84 +105,15 @@ namespace MiniMes.Module.BusinessObjects
             set
             {
                 if (SetPropertyValue(nameof(RealizedAmount), ref realizedAmount, value))
-                {
                     UpdateWorkOrderTotals();
-                }
             }
         }
 
-        private int scrapAmount;
-
-        [RuleRange(0, int.MaxValue)]
-        public int ScrapAmount
-        {
-            get
-            {
-                return scrapAmount;
-            }
-            set
-            {
-                if (SetPropertyValue(nameof(ScrapAmount), ref scrapAmount, value))
-                {
-                    UpdateWorkOrderTotals();
-                }
-            }
-        }
-
-        private string scrapReason;
-
-        public string ScrapReason
-        {
-            get
-            {
-                return scrapReason;
-            }
-            set
-            {
-                SetPropertyValue(nameof(ScrapReason), ref scrapReason, value);
-            }
-        }
-
-        private DateTime startTime;
-
-        public DateTime StartTime
-        {
-            get
-            {
-                return startTime;
-            }
-            set
-            {
-                SetPropertyValue(nameof(StartTime), ref startTime, value);
-            }
-        }
-
-        private DateTime endTime;
-
-        [RuleValueComparison("ProductionEntry_EndTimeNotBeforeStartTime", DefaultContexts.Save, ValueComparisonType.GreaterThanOrEqual, "StartTime", ParametersMode.Expression, CustomMessageTemplate = "End time must not be earlier than start time.")]
-        public DateTime EndTime
-        {
-            get
-            {
-                return endTime;
-            }
-            set
-            {
-                SetPropertyValue(nameof(EndTime), ref endTime, value);
-            }
-        }
-
-        // The parent totals are refreshed as soon as a value changes rather than only in
-        // OnSaving, so the parent is already marked dirty when the commit starts and is written
-        // in the same transaction. OnSaving stays as a safety net for programmatic changes; it
-        // recomputes the same value and therefore does not mark anything dirty again.
-        // See WorkOrder.RecalculateTotals().
         private void UpdateWorkOrderTotals()
         {
             if (IsLoading || IsSaving || IsDeleted || WorkOrder == null)
-            {
                 return;
-            }
+
             WorkOrder.RecalculateTotals();
         }
 
@@ -190,33 +121,16 @@ namespace MiniMes.Module.BusinessObjects
         {
             base.OnSaving();
 
-            if (ScrapAmount > 0)
-
-            //ScrapReason bo�, null veya yaln�zca bo�luklardan olu�uyorsa:
-            {
-                if (string.IsNullOrWhiteSpace(ScrapReason))
-                {
-                    throw new UserFriendlyException("Specify a scrap reason when a scrap quantity is reported.");
-                }
-            }
-
-            // �� emrine ba�l�ysa toplamlar� ba�tan hesaplar.
             if (WorkOrder != null)
-            {
                 WorkOrder.RecalculateTotals();
-            }
         }
 
         protected override void OnDeleting()
         {
-            WorkOrder affectedWorkOrder = WorkOrder;
             base.OnDeleting();
 
-            //Silinen �retim giri�ini hesaba katmadan eski i� emrinin toplamlar�n� yeniden hesaplar.
-            if (affectedWorkOrder != null)
-            {
-                affectedWorkOrder.RecalculateTotals(this);
-            }
+            if (WorkOrder != null)
+                WorkOrder.RecalculateTotals(this);
         }
     }
 }

@@ -158,10 +158,7 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(
-                    nameof(AssignedRole),
-                    ref assignedRole,
-                    value);
+                SetPropertyValue(nameof(AssignedRole),ref assignedRole,value);
             }
         }
 
@@ -175,10 +172,7 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(
-                    nameof(AssignedShift),
-                    ref assignedShift,
-                    value);
+                SetPropertyValue(nameof(AssignedShift), ref assignedShift, value);
             }
         }
 
@@ -244,7 +238,6 @@ namespace MiniMes.Module.BusinessObjects
         public void RecalculateTotals(ProductionEntry excludeEntry = null)
         {
             int totalProduced = 0;
-            int totalScrap = 0;
 
             for (int i = 0; i < ProductionEntries.Count; i++)
             {
@@ -256,13 +249,11 @@ namespace MiniMes.Module.BusinessObjects
                 }
 
                 totalProduced = totalProduced + entry.RealizedAmount;
-                totalScrap = totalScrap + entry.ScrapAmount;
             }
 
             ProducedQuantity = totalProduced;
-            ScrapQuantity = totalScrap;
 
-            if (Status == WorkOrderStatus.Planned && (totalProduced > 0 || totalScrap > 0))
+            if (Status == WorkOrderStatus.Planned && (totalProduced > 0))
             {
                 Status = WorkOrderStatus.InProgress;
             }
