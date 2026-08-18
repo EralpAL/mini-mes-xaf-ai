@@ -18,7 +18,8 @@ namespace MiniMes.Module.BusinessObjects
     [NavigationItem("Production Operations")]
     [DefaultProperty(nameof(Code))]
     [Appearance("Appearance-1", AppearanceItemType.Action, "1=1", TargetItems ="New", Visibility = DevExpress.ExpressApp.Editors.ViewItemVisibility.Hide )]
-    
+    [RuleCriteria("WorkOrder_ScrapNotExceedProduced", DefaultContexts.Save,"ScrapQuantity <= ProducedQuantity", CustomMessageTemplate ="Fire miktarı üretilen miktardan fazla olamaz.")]
+
     public class WorkOrder : BaseObject
     {
         private const string CodePrefix = "WO";
@@ -146,7 +147,7 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         // İş emri başlatılırken seçilen görev.
-        // Eski AssignedRole int kolonu DB'de bırakılır; yeni kolon JobRole.Oid (Guid) ile uyumludur.
+        
         private JobRole assignedRole;
 
         [Persistent("AssignedJobRole")]
@@ -231,13 +232,40 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
+        [Association("WorkOrder-DowntimeLogs")]
+        public XPCollection<DowntimeLog> DowntimeLogs
+        {
+            get
+            {
+                return GetCollection<DowntimeLog>(nameof(DowntimeLogs));
+            }
+        }
+
+        public void CloseOpenDowntime()
+        {
+            DateTime endTime = DateTime.Now;
+
+            for (int i = 0; i < DowntimeLogs.Count; i++)
+            {
+                DowntimeLog downtimeLog = DowntimeLogs[i];
+
+                if (downtimeLog.IsDeleted || downtimeLog.EndTime.HasValue)
+                {
+                    continue;
+                }
+
+                downtimeLog.EndTime = endTime;
+            }
+        }
+
 
         // Üretim girişleri değiştiğinde toplamları baştan hesaplar.
         // Böylece tekrar kaydetme veya düzenleme sırasında çift sayım oluşmaz.
 
         public void RecalculateTotals(ProductionEntry excludeEntry = null)
         {
-            int totalProduced = 0;
+            int totalRealized = 0;
+            int totalScrap = 0;
 
             for (int i = 0; i < ProductionEntries.Count; i++)
             {
@@ -248,12 +276,21 @@ namespace MiniMes.Module.BusinessObjects
                     continue;
                 }
 
-                totalProduced = totalProduced + entry.RealizedAmount;
+                totalRealized = totalRealized + entry.RealizedAmount;
+                totalScrap = totalScrap + entry.ScrapAmount;
             }
 
-            ProducedQuantity = totalProduced;
+            int netProduced = totalRealized - totalScrap;
 
-            if (Status == WorkOrderStatus.Planned && (totalProduced > 0))
+            if (netProduced < 0)
+            {
+                return;
+            }
+
+            ProducedQuantity = netProduced;
+            ScrapQuantity = totalScrap;
+
+            if (Status == WorkOrderStatus.Planned && (totalRealized > 0))
             {
                 Status = WorkOrderStatus.InProgress;
             }

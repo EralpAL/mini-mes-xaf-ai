@@ -65,45 +65,23 @@ namespace MiniMes.Module.Controllers
                 return;
             }
 
-            if (parameters.SelectedEmployee == null)
-            {
-                throw new UserFriendlyException("İş emrini başlatmak için çalışan seçmelisiniz.");
-            }
-
-            if (parameters.SelectedRole == null)
-            {
-                throw new UserFriendlyException("İş emrini başlatmak için görev seçmelisiniz.");
-            }
-
-            if (parameters.SelectedShift == null)
-            {
-                throw new UserFriendlyException("İş emrini başlatmak için vardiya seçmelisiniz.");
-            }
-
             Employee selectedEmployee = ObjectSpace.GetObject(parameters.SelectedEmployee);
             JobRole selectedRole = ObjectSpace.GetObject(parameters.SelectedRole);
             Shift selectedShift = ObjectSpace.GetObject(parameters.SelectedShift);
 
             if (selectedEmployee == null || selectedRole == null || selectedShift == null)
             {
-                throw new UserFriendlyException("Seçilen çalışan, görev veya vardiya bulunamadı.");
+                return;
             }
 
-            // Önce seçilen bütün iş emirlerini kontrol eder.
             for (int i = 0; i < e.SelectedObjects.Count; i++)
             {
                 WorkOrder workOrder = e.SelectedObjects[i] as WorkOrder;
 
-                if (workOrder == null || workOrder.Status != WorkOrderStatus.Planned)
+                if (workOrder == null)
                 {
-                    throw new UserFriendlyException("Yalnızca planlanan iş emirleri başlatılabilir.");
+                    continue;
                 }
-            }
-
-            // Seçilen bilgileri iş emirlerine aktarır ve emirleri başlatır.
-            for (int i = 0; i < e.SelectedObjects.Count; i++)
-            {
-                WorkOrder workOrder = e.SelectedObjects[i] as WorkOrder;
 
                 workOrder.AssignedEmployee = selectedEmployee;
                 workOrder.AssignedRole = selectedRole;
@@ -115,24 +93,49 @@ namespace MiniMes.Module.Controllers
             View.ObjectSpace.Refresh();
         }
 
-        private void WorkOrder_Stop_Execute(object sender, SimpleActionExecuteEventArgs e)
+        private void WorkOrder_Stop_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
+        {
+            WorkOrder workOrder = View.CurrentObject as WorkOrder;
+
+            IObjectSpace popupObjectSpace = Application.CreateObjectSpace(typeof(DowntimeStartParameters));
+            DowntimeStartParameters parameters = popupObjectSpace.CreateObject<DowntimeStartParameters>();
+            parameters.HasWorkStation = workOrder != null && workOrder.AssignedWorkStation != null;
+            DetailView detailView = Application.CreateDetailView(popupObjectSpace, parameters);
+            detailView.Caption = "Duruş Başlat";
+            detailView.ViewEditMode = ViewEditMode.Edit;
+            e.View = detailView;
+        }
+
+        private void WorkOrder_Stop_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
         {
             WorkOrder workOrder = e.CurrentObject as WorkOrder;
+            DowntimeStartParameters parameters = e.PopupWindowViewCurrentObject as DowntimeStartParameters;
 
-            if (workOrder == null)
+            if (workOrder == null || parameters == null)
             {
                 return;
             }
 
-            if (workOrder.Status != WorkOrderStatus.InProgress)
+            StopCause selectedStopCause = ObjectSpace.GetObject(parameters.SelectedStopCause);
+
+            if (selectedStopCause == null)
             {
-                throw new UserFriendlyException("Yalnızca devam eden iş emirleri durdurulabilir.");
+                return;
             }
+
+            DowntimeLog downtimeLog = ObjectSpace.CreateObject<DowntimeLog>();
+            downtimeLog.WorkOrder = workOrder;
+            downtimeLog.WorkStation = workOrder.AssignedWorkStation;
+            downtimeLog.Operator = workOrder.AssignedEmployee;
+            downtimeLog.StopCause = selectedStopCause;
+            downtimeLog.StartTime = DateTime.Now;
 
             workOrder.Status = WorkOrderStatus.Stopped;
 
             ObjectSpace.CommitChanges();
             View.ObjectSpace.Refresh();
+
+            Application.ShowViewStrategy.ShowMessage("Duruş başlatıldı.", InformationType.Success);
         }
 
         private void WorkOrder_Continue_Execute(object sender, SimpleActionExecuteEventArgs e)
@@ -144,15 +147,13 @@ namespace MiniMes.Module.Controllers
                 return;
             }
 
-            if (workOrder.Status != WorkOrderStatus.Stopped)
-            {
-                throw new UserFriendlyException("Yalnızca durdurulan iş emirlerine devam edilebilir.");
-            }
-
+            workOrder.CloseOpenDowntime();
             workOrder.Status = WorkOrderStatus.InProgress;
 
             ObjectSpace.CommitChanges();
             View.ObjectSpace.Refresh();
+
+            Application.ShowViewStrategy.ShowMessage("Duruş bitirildi.", InformationType.Success);
         }
 
         private void WorkOrder_Finish_Execute(object sender, SimpleActionExecuteEventArgs e)
@@ -162,11 +163,6 @@ namespace MiniMes.Module.Controllers
             if (workOrder == null)
             {
                 return;
-            }
-
-            if (workOrder.Status != WorkOrderStatus.InProgress)
-            {
-                throw new UserFriendlyException("Yalnızca devam eden iş emirleri tamamlanabilir.");
             }
 
             workOrder.Status = WorkOrderStatus.Completed;
@@ -211,14 +207,9 @@ namespace MiniMes.Module.Controllers
         {
             WorkOrder workOrder = View.CurrentObject as WorkOrder;
 
-
-            if (workOrder.AssignedWorkStation == null)
-            {
-                throw new UserFriendlyException("Üretim girişi yapabilmek için iş emrine iş istasyonu atanmış olmalıdır.");
-            }
-
             IObjectSpace popupObjectSpace = Application.CreateObjectSpace(typeof(ProductionEntryParameters));
             ProductionEntryParameters parameters = popupObjectSpace.CreateObject<ProductionEntryParameters>();
+            parameters.HasWorkStation = workOrder != null && workOrder.AssignedWorkStation != null;
             DetailView detailView = Application.CreateDetailView(popupObjectSpace, parameters);
             detailView.ViewEditMode = ViewEditMode.Edit;
             e.View = detailView;
@@ -227,17 +218,11 @@ namespace MiniMes.Module.Controllers
         private void WorkOrder_ProductionEntry_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
         {
             WorkOrder workOrder = e.CurrentObject as WorkOrder;
-
-            if (workOrder.AssignedWorkStation == null)
-            {
-                throw new UserFriendlyException("Üretim girişi yapabilmek için iş emrine iş istasyonu atanmış olmalıdır.");
-            }
-
             ProductionEntryParameters parameters = e.PopupWindowViewCurrentObject as ProductionEntryParameters;
 
-            if (parameters == null)
+            if (workOrder == null || parameters == null)
             {
-                throw new UserFriendlyException("Üretim giriş bilgileri alınamadı.");
+                return;
             }
 
             ProductionEntry productionEntry = ObjectSpace.CreateObject<ProductionEntry>();
@@ -246,12 +231,49 @@ namespace MiniMes.Module.Controllers
             productionEntry.Operator = workOrder.AssignedEmployee;
             productionEntry.WorkStation = workOrder.AssignedWorkStation;
             productionEntry.RealizedAmount = parameters.RealizedAmount;
-           
 
             ObjectSpace.CommitChanges();
             ObjectSpace.Refresh();
 
             Application.ShowViewStrategy.ShowMessage("Üretim miktarı başarıyla kaydedildi.",InformationType.Success);
+        }
+
+        private void WorkOrder_ScrapEntry_CustomizePopupWindowParams(object sender, CustomizePopupWindowParamsEventArgs e)
+        {
+            WorkOrder workOrder = View.CurrentObject as WorkOrder;
+
+            IObjectSpace popupObjectSpace = Application.CreateObjectSpace(typeof(ProductionEntryParameters));
+            ProductionEntryParameters parameters = popupObjectSpace.CreateObject<ProductionEntryParameters>();
+            parameters.IsScrapEntry = true;
+            parameters.HasWorkStation = workOrder != null && workOrder.AssignedWorkStation != null;
+            parameters.AvailableQuantity = workOrder != null ? workOrder.ProducedQuantity : 0;
+            DetailView detailView = Application.CreateDetailView(popupObjectSpace, parameters);
+            detailView.Caption = "Fire Girişi";
+            detailView.ViewEditMode = ViewEditMode.Edit;
+            e.View = detailView;
+        }
+
+        private void WorkOrder_ScrapEntry_Execute(object sender, PopupWindowShowActionExecuteEventArgs e)
+        {
+            WorkOrder workOrder = e.CurrentObject as WorkOrder;
+            ProductionEntryParameters parameters = e.PopupWindowViewCurrentObject as ProductionEntryParameters;
+
+            if (workOrder == null || parameters == null)
+            {
+                return;
+            }
+
+            ProductionEntry scrapEntry = ObjectSpace.CreateObject<ProductionEntry>();
+
+            scrapEntry.WorkOrder = workOrder;
+            scrapEntry.Operator = workOrder.AssignedEmployee;
+            scrapEntry.WorkStation = workOrder.AssignedWorkStation;
+            scrapEntry.ScrapAmount = parameters.ScrapAmount;
+
+            ObjectSpace.CommitChanges();
+            ObjectSpace.Refresh();
+
+            Application.ShowViewStrategy.ShowMessage("Fire miktarı başarıyla kaydedildi.", InformationType.Success);
         }
     }
 }

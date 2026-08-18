@@ -33,10 +33,11 @@
         {
             this.components = new System.ComponentModel.Container();
             this.WorkOrder_Start = new DevExpress.ExpressApp.Actions.PopupWindowShowAction(this.components);
-            this.WorkOrder_Stop = new DevExpress.ExpressApp.Actions.SimpleAction(this.components);
+            this.WorkOrder_Stop = new DevExpress.ExpressApp.Actions.PopupWindowShowAction(this.components);
             this.WorkOrder_Continue = new DevExpress.ExpressApp.Actions.SimpleAction(this.components);
             this.WorkOrder_Finish = new DevExpress.ExpressApp.Actions.SimpleAction(this.components);
             this.WorkOrder_ProductionEntry = new DevExpress.ExpressApp.Actions.PopupWindowShowAction(this.components);
+            this.WorkOrder_ScrapEntry = new DevExpress.ExpressApp.Actions.PopupWindowShowAction(this.components);
             //
             // WorkOrder_Start
             //
@@ -53,26 +54,25 @@
             //
             // WorkOrder_Stop
             //
-            this.WorkOrder_Stop.Caption = "Durdur";
+            this.WorkOrder_Stop.Caption = "Duruş Başlat";
             this.WorkOrder_Stop.Category = "View";
-            this.WorkOrder_Stop.ConfirmationMessage = "Bu iş emrini durdurmak istediğinize emin misiniz?";
             this.WorkOrder_Stop.Id = "WorkOrder.Stop";
             this.WorkOrder_Stop.TargetObjectType = typeof(MiniMes.Module.BusinessObjects.WorkOrder);
             this.WorkOrder_Stop.SelectionDependencyType = DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
-            this.WorkOrder_Stop.TargetObjectsCriteria = "Status = 'InProgress'";
-            this.WorkOrder_Stop.ToolTip = "Devam eden iş emrini durdurur.";
-            this.WorkOrder_Stop.Execute += new DevExpress.ExpressApp.Actions.SimpleActionExecuteEventHandler(this.WorkOrder_Stop_Execute);
+            this.WorkOrder_Stop.TargetObjectsCriteria = "Status = 'InProgress' AND AssignedWorkStation is not null";
+            this.WorkOrder_Stop.ToolTip = "Devam eden iş emrinde duruş başlatır.";
+            this.WorkOrder_Stop.CustomizePopupWindowParams += new DevExpress.ExpressApp.Actions.CustomizePopupWindowParamsEventHandler(this.WorkOrder_Stop_CustomizePopupWindowParams);
+            this.WorkOrder_Stop.Execute += new DevExpress.ExpressApp.Actions.PopupWindowShowActionExecuteEventHandler(this.WorkOrder_Stop_Execute);
             //
             // WorkOrder_Continue
             //
-            this.WorkOrder_Continue.Caption = "Devam Et";
+            this.WorkOrder_Continue.Caption = "Duruş Bitir";
             this.WorkOrder_Continue.Category = "View";
-            this.WorkOrder_Continue.ConfirmationMessage = "Bu iş emrine devam etmek istediğinize emin misiniz?";
             this.WorkOrder_Continue.Id = "WorkOrder.Resume";
             this.WorkOrder_Continue.TargetObjectType = typeof(MiniMes.Module.BusinessObjects.WorkOrder);
             this.WorkOrder_Continue.SelectionDependencyType = DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
             this.WorkOrder_Continue.TargetObjectsCriteria = "Status = 'Stopped'";
-            this.WorkOrder_Continue.ToolTip = "Durdurulan iş emrine devam eder.";
+            this.WorkOrder_Continue.ToolTip = "Açık duruşu bitirir ve iş emrine devam eder.";
             this.WorkOrder_Continue.Execute += new DevExpress.ExpressApp.Actions.SimpleActionExecuteEventHandler(this.WorkOrder_Continue_Execute);
             //
             // WorkOrder_Finish
@@ -94,10 +94,22 @@
             this.WorkOrder_ProductionEntry.Id = "WorkOrder.ProductionEntry";
             this.WorkOrder_ProductionEntry.TargetObjectType = typeof(MiniMes.Module.BusinessObjects.WorkOrder);
             this.WorkOrder_ProductionEntry.SelectionDependencyType = DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
-            this.WorkOrder_ProductionEntry.TargetObjectsCriteria = "Status = 'InProgress'";
+            this.WorkOrder_ProductionEntry.TargetObjectsCriteria = "Status = 'InProgress' AND AssignedWorkStation is not null";
             this.WorkOrder_ProductionEntry.ToolTip = "Devam eden iş emrine üretim miktarı girer.";
             this.WorkOrder_ProductionEntry.CustomizePopupWindowParams += new DevExpress.ExpressApp.Actions.CustomizePopupWindowParamsEventHandler(this.WorkOrder_ProductionEntry_CustomizePopupWindowParams);
             this.WorkOrder_ProductionEntry.Execute += new DevExpress.ExpressApp.Actions.PopupWindowShowActionExecuteEventHandler(this.WorkOrder_ProductionEntry_Execute);
+            //
+            // WorkOrder_ScrapEntry
+            //
+            this.WorkOrder_ScrapEntry.Caption = "Fire Girişi";
+            this.WorkOrder_ScrapEntry.Category = "View";
+            this.WorkOrder_ScrapEntry.Id = "WorkOrder.ScrapEntry";
+            this.WorkOrder_ScrapEntry.TargetObjectType = typeof(MiniMes.Module.BusinessObjects.WorkOrder);
+            this.WorkOrder_ScrapEntry.SelectionDependencyType = DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
+            this.WorkOrder_ScrapEntry.TargetObjectsCriteria = "Status = 'InProgress' AND AssignedWorkStation is not null AND ProducedQuantity > 0";
+            this.WorkOrder_ScrapEntry.ToolTip = "Devam eden iş emrine fire miktarı girer.";
+            this.WorkOrder_ScrapEntry.CustomizePopupWindowParams += new DevExpress.ExpressApp.Actions.CustomizePopupWindowParamsEventHandler(this.WorkOrder_ScrapEntry_CustomizePopupWindowParams);
+            this.WorkOrder_ScrapEntry.Execute += new DevExpress.ExpressApp.Actions.PopupWindowShowActionExecuteEventHandler(this.WorkOrder_ScrapEntry_Execute);
             //
             // ViewControllerWorkOrder
             //
@@ -106,14 +118,16 @@
             this.Actions.Add(this.WorkOrder_Continue);
             this.Actions.Add(this.WorkOrder_Finish);
             this.Actions.Add(this.WorkOrder_ProductionEntry);
+            this.Actions.Add(this.WorkOrder_ScrapEntry);
         }
 
         #endregion
 
         private DevExpress.ExpressApp.Actions.PopupWindowShowAction WorkOrder_Start;
-        private DevExpress.ExpressApp.Actions.SimpleAction WorkOrder_Stop;
+        private DevExpress.ExpressApp.Actions.PopupWindowShowAction WorkOrder_Stop;
         private DevExpress.ExpressApp.Actions.SimpleAction WorkOrder_Continue;
         private DevExpress.ExpressApp.Actions.SimpleAction WorkOrder_Finish;
         private DevExpress.ExpressApp.Actions.PopupWindowShowAction WorkOrder_ProductionEntry;
+        private DevExpress.ExpressApp.Actions.PopupWindowShowAction WorkOrder_ScrapEntry;
     }
 }

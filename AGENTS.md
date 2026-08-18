@@ -140,6 +140,14 @@ Prefer built-in DevExpress Validation Module attributes over hand-written valida
 | One property must be `>=`/`>`/etc. another property on the same object | `[RuleValueComparison(id, DefaultContexts.Save, ValueComparisonType.GreaterThanOrEqual, "OtherProperty", ParametersMode.Expression)]` |
 | Object-level cross-property/cross-reference rule | `[RuleCriteria(id, DefaultContexts.Save, "criteria string")]` at the class level |
 
+Write `RuleCriteria` at class level, one rule per concern, with a unique `ClassName_Purpose` id, `DefaultContexts.Save`, and a Turkish `CustomMessageTemplate`. For mode-specific popup validation use `Flag OR ...` / `!Flag OR ...` so the rule only applies in the relevant mode:
+
+```csharp
+[RuleCriteria("ProductionEntryParameters_RealizedAmount", DefaultContexts.Save, "IsScrapEntry OR RealizedAmount > 0", CustomMessageTemplate = "Üretilen miktar sıfırdan büyük olmalıdır.")]
+[RuleCriteria("ProductionEntryParameters_ScrapAmountPositive", DefaultContexts.Save, "!IsScrapEntry OR ScrapAmount > 0", CustomMessageTemplate = "Fire miktarı sıfırdan büyük olmalıdır.")]
+[RuleCriteria("ProductionEntryParameters_ScrapAmountNotExceedProduced", DefaultContexts.Save, "!IsScrapEntry OR ScrapAmount <= AvailableQuantity", CustomMessageTemplate = "Fire miktarı, mevcut üretim miktarından fazla olamaz.")]
+```
+
 Do not write manual `if` validation in setters or overridden `OnSaving()` when one of the above attributes can express the same rule.
 
 ## 8. Controller Conventions

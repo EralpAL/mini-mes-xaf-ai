@@ -115,6 +115,14 @@
         <Member Name="ProducedQuantity" Caption="Üretilen Miktar" />
         <Member Name="ScrapQuantity" Caption="Fire Miktarı" />
         <Member Name="ProductionEntries" Caption="Üretim Girişleri" />
+        <Member Name="DowntimeLogs" Caption="Duruş Kayıtları" />
+      </OwnMembers>
+    </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.ProductionEntryParameters" Caption="Üretim Girişi">
+      <OwnMembers>
+        <Member Name="RealizedAmount" Caption="Üretilen Miktar" />
+        <Member Name="AvailableQuantity" Caption="Mevcut Üretim Miktarı" />
+        <Member Name="ScrapAmount" Caption="Fire Miktarı" />
       </OwnMembers>
     </Class>
     <Class Name="MiniMes.Module.BusinessObjects.ProductionEntry" Caption="Üretim Girişi">
@@ -129,9 +137,15 @@
         <Member Name="EndTime" Caption="Bitiş Zamanı" />
       </OwnMembers>
     </Class>
+    <Class Name="MiniMes.Module.BusinessObjects.DowntimeStartParameters" Caption="Duruş Başlat">
+      <OwnMembers>
+        <Member Name="SelectedStopCause" Caption="Duruş Nedeni" />
+      </OwnMembers>
+    </Class>
     <Class Name="MiniMes.Module.BusinessObjects.DowntimeLog" Caption="Duruş Kaydı">
       <OwnMembers>
         <Member Name="StartTime" Caption="Başlangıç Zamanı" />
+        <Member Name="EndTime" Caption="Bitiş Zamanı" />
         <Member Name="WorkStation" Caption="İş İstasyonu" />
         <Member Name="WorkOrder" Caption="İş Emri" />
         <Member Name="StopCause" Caption="Duruş Nedeni" />
@@ -171,14 +185,21 @@
       <Action Id="Approve" Caption="Onayla" ToolTip="Hedef ürünün rotasındaki iş emirlerini oluşturur ve emri başlatır." ConfirmationMessage="Bu üretim emrini onaylamak ve iş emirlerini oluşturmak istediğinize emin misiniz?" />
       <Action Id="CompleteProductionOrder" Caption="Tamamla" ToolTip="Emri ve açık iş emirlerini kapatır." ConfirmationMessage="Bu üretim emrini tamamlamak istediğinize emin misiniz?" />
       <Action Id="CancelProductionOrder" Caption="Emri İptal Et" ToolTip="Emri ve tamamlanmamış iş emirlerini iptal eder." ConfirmationMessage="Bu üretim emrini iptal etmek istediğinize emin misiniz?" />
+      <Action Id="WorkOrder.ScrapEntry" Caption="Fire Girişi" ToolTip="Devam eden iş emrine fire miktarı girer." />
+      <Action Id="WorkOrder.Stop" Caption="Duruş Başlat" ToolTip="Devam eden iş emrinde duruş başlatır." />
+      <Action Id="WorkOrder.Resume" Caption="Duruş Bitir" ToolTip="Açık duruşu bitirir ve iş emrine devam eder." />
     </Actions>
   </ActionDesign>
   <Validation>
     <Rules>
       <RuleCriteria Id="ProductionOrder_PlannedQuantityGreaterThanZero" CustomMessageTemplate="Planlanan miktar sıfırdan büyük olmalıdır." />
-      <RuleCriteria Id="ProductionEntry_QuantityEntered" CustomMessageTemplate="Gerçekleşen miktar, fire miktarı veya her ikisi girilmelidir." />
+      <RuleCriteria Id="ProductionEntry_QuantityEntered" CustomMessageTemplate="Üretilen miktar veya fire miktarı sıfırdan büyük olmalıdır." />
+      <RuleCriteria Id="WorkOrder_ScrapNotExceedProduced" CustomMessageTemplate="Fire miktarı, üretilen miktardan fazla olamaz." />
+      <RuleCriteria Id="ProductionEntryParameters_WorkStationRequired" CustomMessageTemplate="Üretim veya fire girişi yapabilmek için iş emrine iş istasyonu atanmış olmalıdır." />
+      <RuleCriteria Id="ProductionEntryParameters_ProductionExists" CustomMessageTemplate="Fire girişi yapabilmek için önce üretim girişi yapılmalıdır." />
       <RuleCriteria Id="ProductionEntry_ScrapReasonRequired" CustomMessageTemplate="Fire miktarı girildiğinde fire nedeni belirtilmelidir." />
-      <RuleCriteria Id="DowntimeLog_DurationGreaterThanZero" CustomMessageTemplate="Duruş süresi sıfır dakikadan büyük olmalıdır." />
+      <RuleCriteria Id="DowntimeLog_EndTimeNotBeforeStartTime" CustomMessageTemplate="Bitiş zamanı başlangıç zamanından önce olamaz." />
+      <RuleCriteria Id="DowntimeStartParameters_WorkStationRequired" CustomMessageTemplate="Duruş başlatmak için iş emrine iş istasyonu atanmış olmalıdır." />
       <RuleValueComparison Id="ProductionEntry_EndTimeNotBeforeStartTime" CustomMessageTemplate="Bitiş zamanı başlangıç zamanından önce olamaz." />
     </Rules>
   </Validation>
@@ -214,7 +235,7 @@
         <LocalizationItem Name="Planned" Value="Planlandı" />
         <LocalizationItem Name="InProgress" Value="Devam Ediyor" />
         <LocalizationItem Name="Completed" Value="Tamamlandı" />
-        <LocalizationItem Name="Canceled" Value="İptal Edildi" />
+        <LocalizationItem Name="Stopped" Value="Duruşta" />
       </LocalizationGroup>
       <LocalizationGroup Name="MiniMes.Module.Enums.MaintenanceType">
         <LocalizationItem Name="Preventive" Value="Önleyici" />

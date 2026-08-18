@@ -1,5 +1,3 @@
-using DevExpress.Data.Filtering;
-using DevExpress.ExpressApp;
 using DevExpress.ExpressApp.DC;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
@@ -7,23 +5,20 @@ using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
-    [XafDisplayName("Duruþ Kaydý")]
+    [XafDisplayName("Duru? Kayd?")]
     [NavigationItem("Production Operations")]
-    [RuleCriteria("DowntimeLog_DurationGreaterThanZero", DefaultContexts.Save,"DurationMinutes > 0", CustomMessageTemplate = "Downtime duration must be greater than zero minutes.")]
+    [RuleCriteria("DowntimeLog_EndTimeNotBeforeStartTime", DefaultContexts.Save, "EndTime is null OR EndTime >= StartTime", CustomMessageTemplate = "Biti? zaman? ba?lang?ç zaman?ndan önce olamaz.")]
     public class DowntimeLog : BaseObject
-    { 
+    {
         public DowntimeLog(Session session)
             : base(session)
         {
         }
+
         public override void AfterConstruction()
         {
             base.AfterConstruction();
@@ -40,7 +35,27 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(nameof(StartTime), ref startTime, value);
+                if (SetPropertyValue(nameof(StartTime), ref startTime, value))
+                {
+                    UpdateDuration();
+                }
+            }
+        }
+
+        private DateTime? endTime;
+
+        public DateTime? EndTime
+        {
+            get
+            {
+                return endTime;
+            }
+            set
+            {
+                if (SetPropertyValue(nameof(EndTime), ref endTime, value))
+                {
+                    UpdateDuration();
+                }
             }
         }
 
@@ -62,6 +77,7 @@ namespace MiniMes.Module.BusinessObjects
 
         private WorkOrder workOrder;
 
+        [Association("WorkOrder-DowntimeLogs")]
         public WorkOrder WorkOrder
         {
             get
@@ -107,6 +123,7 @@ namespace MiniMes.Module.BusinessObjects
         private double durationMinutes;
 
         [RuleRange(0.0, double.MaxValue)]
+        [ModelDefault("AllowEdit", "False")]
         public double DurationMinutes
         {
             get
@@ -132,6 +149,30 @@ namespace MiniMes.Module.BusinessObjects
             {
                 SetPropertyValue(nameof(Description), ref description, value);
             }
+        }
+
+        private void UpdateDuration()
+        {
+            if (IsLoading)
+            {
+                return;
+            }
+
+            if (!EndTime.HasValue)
+            {
+                DurationMinutes = 0;
+                return;
+            }
+
+            TimeSpan duration = EndTime.Value - StartTime;
+            double totalMinutes = duration.TotalMinutes;
+
+            if (totalMinutes < 0)
+            {
+                totalMinutes = 0;
+            }
+
+            DurationMinutes = totalMinutes;
         }
     }
 }

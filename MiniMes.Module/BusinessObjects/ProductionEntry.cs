@@ -20,6 +20,7 @@ namespace MiniMes.Module.BusinessObjects
     [NavigationItem(false)]
     [Appearance("ProductionEntry_HideNew",AppearanceItemType.Action,"1=1",TargetItems = "New",Visibility = ViewItemVisibility.Hide)]
     [XafDisplayName("Üretim Girişi")]
+    [RuleCriteria( "ProductionEntry_QuantityEntered", DefaultContexts.Save,"RealizedAmount > 0 OR ScrapAmount > 0", CustomMessageTemplate = "Üretilen miktar veya fire miktarı sıfırdan büyük olmalıdır.")]
 
     public class ProductionEntry : BaseObject
     {
@@ -104,15 +105,30 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                if (SetPropertyValue(nameof(RealizedAmount), ref realizedAmount, value))
-                    UpdateWorkOrderTotals();
+                if (SetPropertyValue(nameof(RealizedAmount), ref realizedAmount, value)) UpdateWorkOrderTotals();
+            }
+        }
+
+        //fire girişi
+        private int scrapAmount;
+
+        [RuleRange(0, int.MaxValue)]
+        [XafDisplayName("Fire Miktarı")]
+        public int ScrapAmount
+        {
+            get
+            {
+                return scrapAmount;
+            }
+            set
+            {
+                if (SetPropertyValue(nameof(ScrapAmount), ref scrapAmount, value)) UpdateWorkOrderTotals();
             }
         }
 
         private void UpdateWorkOrderTotals()
         {
-            if (IsLoading || IsSaving || IsDeleted || WorkOrder == null)
-                return;
+            if (IsLoading || IsSaving || IsDeleted || WorkOrder == null) return;
 
             WorkOrder.RecalculateTotals();
         }
@@ -121,16 +137,14 @@ namespace MiniMes.Module.BusinessObjects
         {
             base.OnSaving();
 
-            if (WorkOrder != null)
-                WorkOrder.RecalculateTotals();
+            if (WorkOrder != null) WorkOrder.RecalculateTotals();
         }
 
         protected override void OnDeleting()
         {
             base.OnDeleting();
 
-            if (WorkOrder != null)
-                WorkOrder.RecalculateTotals(this);
+            if (WorkOrder != null) WorkOrder.RecalculateTotals(this);
         }
     }
 }
