@@ -30,7 +30,7 @@ public sealed class MiniMesModule : ModuleBase {
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.SystemModule.SystemModule));
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.Security.SecurityModule));
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.AuditTrail.AuditTrailModule));
-		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.Objects.BusinessClassLibraryCustomizationModule));
+		//RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.Objects.BusinessClassLibraryCustomizationModule)); //https://devexpress.com/kb=T1312589
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.Chart.ChartModule));
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.ConditionalAppearance.ConditionalAppearanceModule));
 		RequiredModuleTypes.Add(typeof(DevExpress.ExpressApp.Validation.ValidationModule));

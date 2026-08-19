@@ -213,6 +213,11 @@ namespace MiniMes.Module.BusinessObjects
         private string aiDelayAnalysis;
 
         [Size(SizeAttribute.Unlimited)]
+        // kullanıcı elle değiştirmesin
+        [ModelDefault("AllowEdit", "False")]
+        [VisibleInDetailView(false)]
+        [VisibleInListView(false)]
+        [VisibleInLookupListView(false)]
         public string AiDelayAnalysis
         {
             get
@@ -228,6 +233,11 @@ namespace MiniMes.Module.BusinessObjects
         private string aiOptimizationRecommendation;
 
         [Size(SizeAttribute.Unlimited)]
+        // kullanıcı elle değiştirmesin
+        [ModelDefault("AllowEdit", "False")]
+        [VisibleInDetailView(false)]
+        [VisibleInListView(false)]
+        [VisibleInLookupListView(false)]
         public string AiOptimizationRecommendation
         {
             get
@@ -236,10 +246,7 @@ namespace MiniMes.Module.BusinessObjects
             }
             set
             {
-                SetPropertyValue(
-                    nameof(AiOptimizationRecommendation),
-                    ref aiOptimizationRecommendation,
-                    value);
+                SetPropertyValue(  nameof(AiOptimizationRecommendation),  ref aiOptimizationRecommendation, value);
             }
         }
 
@@ -250,6 +257,16 @@ namespace MiniMes.Module.BusinessObjects
             {
                 return GetCollection<WorkOrder>(
                     nameof(WorkOrders));
+            }
+        }
+
+        [Association("ProductionOrder-AiAnalysisRecords")]
+        [XafDisplayName("AI Analiz Geçmişi")]
+        public XPCollection<AiAnalysisRecord> AiAnalysisRecords
+        {
+            get
+            {
+                return GetCollection<AiAnalysisRecord>(nameof(AiAnalysisRecords));
             }
         }
 

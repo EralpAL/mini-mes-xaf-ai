@@ -1,6 +1,6 @@
 ﻿{
   "ConnectionStrings": {
-    "ConnectionString": "Data Source=.\\SQLEXPRESS;Initial Catalog=MiniMes;Integrated Security=True;TrustServerCertificate=True",
+    "ConnectionString": "Integrated Security=SSPI;Pooling=false;Data Source=.\\SQLEXPRESS;Initial Catalog=MiniMes",
     "EasyTestConnectionString": "Integrated Security=SSPI;Pooling=false;Data Source=.\\SQLEXPRESS;Initial Catalog=MiniMesEasyTest"
   },
   "Logging": {
@@ -16,10 +16,6 @@
     "ExpressApp": {
       "Languages": "en-US;tr-TR;",
       "ShowLanguageSwitcher": false,
-      "Security": {
-        // The debug secret key. You should store sensitive settings in dedicated secret storage. For more information, refer to the following topic: https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets?view=aspnetcore-7.0&tabs=windows.
-        "UrlSigningKey": "D03F09E2A868498BA98B3F76F25C1D35"
-      },
       "ThemeSwitcher": {
         "DefaultItemName": "Office White",
         "ShowSizeModeSwitcher": true,

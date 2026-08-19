@@ -14,7 +14,6 @@
     <None Remove="Controllers\NewFolder\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="Controllers\HideProductionOrderWorkOrdersSearchController.cs" />
     <Compile Remove="Controllers\ProductionOrderApproveController.cs" />
     <Compile Remove="Controllers\ViewControllerProductiomOrder.cs" />
     <Compile Remove="Controllers\ViewControllerProductiomOrder.Designer.cs" />
@@ -34,21 +33,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DevExpress.ExpressApp" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Security" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="26.1.4" />
-    <PackageReference Include="DevExpress.Persistent.Base" Version="26.1.4" />
-    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="26.1.4" />
-    <PackageReference Include="Azure.Identity" Version="1.17.1" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.18.0" />
-  
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
-    <PackageReference Include="Microsoft.Extensions.AI" Version="10.8.0" />
+    <PackageReference Include="DevExpress.ExpressApp" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Objects" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Security" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="24.1.7" />
+    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="24.1.7" />
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
   </ItemGroup>
 </Project>

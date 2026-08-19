@@ -17,14 +17,12 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DevExpress.AIIntegration.Blazor" Version="26.1.4" />
-    <PackageReference Include="DevExpress.Drawing.Skia" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Blazor" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="26.1.4" />
-    <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor" Version="26.1.4" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.30" />
-    <PackageReference Include="OllamaSharp" Version="5.4.30" />
+    <PackageReference Include="DevExpress.Drawing.Skia" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Blazor" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation.Blazor" Version="24.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MiniMes.Module\MiniMes.Module.csproj" />

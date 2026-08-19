@@ -16,7 +16,7 @@ public class MiniMesWindowsFormsApplication : WinApplication {
 		SplashScreen = new DXSplashScreen(typeof(XafSplashScreen), new DefaultOverlayFormOptions());
         ApplicationName = "MiniMes";
         CheckCompatibilityType = DevExpress.ExpressApp.CheckCompatibilityType.DatabaseSchema;
-        UseOldTemplates = false;
+        //UseOldTemplates = false; //https://devexpress.com/KB=T1323140
         DatabaseVersionMismatch += MiniMesWindowsFormsApplication_DatabaseVersionMismatch;
         CustomizeLanguagesList += MiniMesWindowsFormsApplication_CustomizeLanguagesList;
     }

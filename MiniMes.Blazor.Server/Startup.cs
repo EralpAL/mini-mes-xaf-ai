@@ -11,6 +11,11 @@ using DevExpress.Persistent.BaseImpl.PermissionPolicy;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
+// Ai integration
+using DevExpress.AIIntegration;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
+
 namespace MiniMes.Blazor.Server;
 
 public class Startup {
@@ -28,6 +33,14 @@ public class Startup {
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
+
+        // Ai integration
+        IChatClient chatClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma3:1b");
+
+        services.AddChatClient(chatClient);
+        services.AddDevExpressAI();
+
+
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
         services.AddXaf(Configuration, builder => {
             builder.UseApplication<MiniMesBlazorApplication>();
@@ -119,6 +132,7 @@ public class Startup {
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseAntiforgery();
         app.UseXaf();
         app.UseEndpoints(endpoints => {
             endpoints.MapXafEndpoints();
