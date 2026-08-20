@@ -11,41 +11,71 @@ using System.Collections.Generic;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
-    public class Routings : BaseObject { 
+    public class Routings : BaseObject {
+        private const string CodePrefix = "ROT";
+
         public Routings(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-           
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Routings), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Routings), CodePrefix);
+            }
+        }
+
+        private string routingCode;
+        [RuleRequiredField]
+        [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
+        public string Code
+        {
+            get { return routingCode; }
+            set { SetPropertyValue(nameof(Code), ref routingCode, value); }
+        }
+
+        private string routingName;
+        [RuleRequiredField]
+        public String Name
+        {
+            get { return routingName; }
+            set { SetPropertyValue(nameof(Name), ref routingName, value); }
         }
 
         private StockCard stockCard;
-        [Association("StockCard-Routings")]
+        [RuleRequiredField]
+        [Association("StockCard-RoutingHeaders")]
         public StockCard StockCard
         {
             get { return stockCard; }
-            set { SetPropertyValue(nameof(StockCard), ref stockCard, value); }
+            set
+            {
+                if (SetPropertyValue(nameof(StockCard), ref stockCard, value) && !IsLoading && value != null)
+                {
+                    for (int i = 0; i < RoutingDetails.Count; i++)
+                    {
+                        RoutingDetails[i].StockCard = value;
+                    }
+                }
+            }
         }
 
-        private int sequenceNumber;
-        public int SequenceNumber
+        [DevExpress.Xpo.Aggregated]
+        [Association("Routings-RoutingDetails")]
+        public XPCollection<RoutingDetail> RoutingDetails
         {
-            get { return sequenceNumber; }
-            set { SetPropertyValue(nameof(SequenceNumber), ref sequenceNumber, value); }
-        }
-    
-        private Operation operation;
-        [Association("Operation-Routings")]
-        public Operation Operation
-        {
-            get { return operation; }
-            set { SetPropertyValue(nameof(Operation), ref operation, value); }
+            get { return GetCollection<RoutingDetail>(nameof(RoutingDetails)); }
         }
 
     }

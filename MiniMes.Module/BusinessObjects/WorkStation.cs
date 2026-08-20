@@ -11,23 +11,36 @@ using System.Collections.Generic;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
 
     public class WorkStation : BaseObject { 
+        private const string CodePrefix = "WS";
+
         public WorkStation(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
-            
+            IsActive = true;
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkStation), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(WorkStation), CodePrefix);
+            }
         }
 
         private string workStationCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return workStationCode; }
@@ -41,8 +54,9 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref workStationName, value); }
         }
 
-        private decimal hourlyCost;
-        public decimal HourlyCost
+        private  double hourlyCost;
+        [RuleRange(0.0, double.MaxValue)]
+        public double HourlyCost
         {
             get { return hourlyCost; }
             set { SetPropertyValue(nameof(HourlyCost), ref hourlyCost, value); }
@@ -56,18 +70,27 @@ namespace MiniMes.Module.BusinessObjects {
 
 
         [Association("WorkStation-Equipments")]
-        public XPCollection<Equipments> Equipments
+        public XPCollection<Equipment> Equipments
         {
-            get { return GetCollection<Equipments>(nameof(Equipments)); }
+            get { return GetCollection<Equipment>(nameof(Equipments)); }
         }
 
 
-        [Association("WorkStation-Employees")]
-        public XPCollection<Employee> Employees
+        [Association("WorkStation-MaintenanceLogs")]
+        public XPCollection<MaintenanceLog> MaintenanceLogs
         {
             get
             {
-                return GetCollection<Employee>(nameof(Employees));
+                return GetCollection<MaintenanceLog>(nameof(MaintenanceLogs));
+            }
+        }
+
+        [Association("WorkStation-Downtimes")]
+        public XPCollection<DowntimeLog> Downtime
+        {
+            get
+            {
+                return GetCollection<DowntimeLog>(nameof(Downtime));
             }
         }
 

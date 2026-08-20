@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" ?>
-<Application Title="MiniMes">
+<Application Title="MiniMes" PreferredLanguage="(User language)">
   <BOModel>
     <Class Name="DevExpress.Persistent.BaseImpl.PermissionPolicy.PermissionPolicyUser" Caption="Base User" />
   </BOModel>
@@ -8,5 +8,43 @@
   </Options>
   <Views>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
+    <DetailView Id="AiAnalysisRecord_DetailView" Caption="AI Sorgusu" AllowEdit="False" AllowNew="False" AllowDelete="False">
+      <Items>
+        <PropertyEditor Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
+        <PropertyEditor Id="ModelName" Index="1" Caption="Kullanılan Model" />
+        <PropertyEditor Id="UserQuestion" Index="2" RowCount="4" Caption="Kullanıcı Sorusu" />
+        <PropertyEditor Id="AnalysisText" Index="3" RowCount="9" Caption="AI Yanıtı" />
+        <PropertyEditor Id="OptimizationRecommendation" Index="-1" Removed="True" />
+        <PropertyEditor Id="ProductionOrder" Index="-1" Removed="True" />
+      </Items>
+      <Layout>
+        <LayoutGroup Id="Main" Direction="Vertical" ShowCaption="False">
+          <LayoutItem Id="AnalysisDate" ViewItem="AnalysisDate" Index="0" />
+          <LayoutItem Id="ModelName" ViewItem="ModelName" Index="1" />
+          <LayoutItem Id="UserQuestion" ViewItem="UserQuestion" Index="2" RelativeSize="40" />
+          <LayoutItem Id="AnalysisText" ViewItem="AnalysisText" Index="3" RelativeSize="60" />
+        </LayoutGroup>
+      </Layout>
+    </DetailView>
+    <ListView Id="AiAnalysisRecord_ListView" Caption="AI Sorgu Geçmişi" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
+      <Columns>
+        <ColumnInfo Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
+        <ColumnInfo Id="ModelName" Index="1" Caption="Kullanılan Model" />
+        <ColumnInfo Id="UserQuestion" Index="2" Caption="Kullanıcı Sorusu" />
+        <ColumnInfo Id="AnalysisText" Index="3" Caption="AI Yanıtı" />
+        <ColumnInfo Id="ProductionOrder" Index="-1" Removed="True" />
+        <ColumnInfo Id="OptimizationRecommendation" Index="-1" Removed="True" />
+      </Columns>
+    </ListView>
+    <ListView Id="ProductionOrder_AiAnalysisRecords_ListView" Caption="AI Sorgu Geçmişi" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
+      <Columns>
+        <ColumnInfo Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
+        <ColumnInfo Id="ModelName" Index="1" Caption="Kullanılan Model" />
+        <ColumnInfo Id="UserQuestion" Index="2" Caption="Kullanıcı Sorusu" />
+        <ColumnInfo Id="AnalysisText" Index="3" Caption="AI Yanıtı" />
+        <ColumnInfo Id="ProductionOrder" Index="-1" Removed="True" />
+        <ColumnInfo Id="OptimizationRecommendation" Index="-1" Removed="True" />
+      </Columns>
+    </ListView>
   </Views>
 </Application>

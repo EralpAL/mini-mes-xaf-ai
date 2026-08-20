@@ -8,6 +8,16 @@ using Microsoft.AspNetCore.Components.Server.Circuits;
 using DevExpress.ExpressApp.Xpo;
 using MiniMes.Blazor.Server.Services;
 using DevExpress.Persistent.BaseImpl.PermissionPolicy;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
+
+// Ai integration
+using DevExpress.AIIntegration;
+using Microsoft.Extensions.AI;
+using MiniMes.AI.Interfaces;
+using MiniMes.AI.Services;
+using MiniMes.Module.Services;
+using OllamaSharp;
 
 namespace MiniMes.Blazor.Server;
 
@@ -26,6 +36,22 @@ public class Startup {
         services.AddRazorPages();
         services.AddServerSideBlazor();
         services.AddHttpContextAccessor();
+
+        // Ai integration
+        OllamaApiClient ollamaApiClient = new OllamaApiClient(new Uri("http://localhost:11434"), "qwen3:1.7b");
+
+        services
+            .AddChatClient(ollamaApiClient)
+            .UseFunctionInvocation();
+        services.AddDevExpressAI();
+
+        services.AddScoped<IProductionOrderTool, XafProductionOrderTool>();
+        services.AddScoped<IMesDataTool, XafMesDataTool>();
+        services.AddScoped<IMesAiAssistantService, MesAiAssistantService>();
+        services.AddScoped<XafAiAnalysisLogService>();
+        services.AddScoped<MesAiChatPanelState>();
+
+
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
         services.AddXaf(Configuration, builder => {
             builder.UseApplication<MiniMesBlazorApplication>();
@@ -80,6 +106,19 @@ public class Startup {
                     options.IsSupportChangePassword = true;
                 });
         });
+        // XAF reads the same language list from the "DevExpress:ExpressApp:Languages" setting in
+        // appsettings.json. The cultures are repeated here so that RequestLocalizationMiddleware
+        // detects the browser culture and falls back to English for every unsupported language.
+        services.Configure<RequestLocalizationOptions>(options => {
+            List<CultureInfo> supportedCultures = new List<CultureInfo>();
+            supportedCultures.Add(new CultureInfo("en-US"));
+            supportedCultures.Add(new CultureInfo("tr-TR"));
+
+            options.DefaultRequestCulture = new RequestCulture("en-US");
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
+
         var authentication = services.AddAuthentication(options => {
             options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         });
@@ -104,6 +143,7 @@ public class Startup {
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseAntiforgery();
         app.UseXaf();
         app.UseEndpoints(endpoints => {
             endpoints.MapXafEndpoints();

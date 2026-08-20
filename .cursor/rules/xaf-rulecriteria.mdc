@@ -1,0 +1,27 @@
+---
+description: XAF RuleCriteria yazım stili — sınıf düzeyinde, bir kural bir iş, Türkçe mesaj
+globs: MiniMes.Module/BusinessObjects/**/*.cs
+alwaysApply: false
+---
+
+# XAF RuleCriteria
+
+Nesne düzeyindeki doğrulamayı `if` / `OnSaving` ile değil, sınıf üzerindeki `[RuleCriteria]` ile yaz.
+
+```csharp
+[RuleCriteria("ClassName_Purpose", DefaultContexts.Save, "criteria", CustomMessageTemplate = "Türkçe mesaj.")]
+```
+
+- Id: `ClassName_Purpose` (ör. `ProductionEntryParameters_ScrapAmountPositive`)
+- Context: `DefaultContexts.Save`
+- Mesaj: `CustomMessageTemplate`, Türkçe, kullanıcıya gösterilecek
+- Bir kural = bir iş (pozitif miktar, tavan kontrolü, zorunluluk ayrı ayrı)
+- Koşullu kural: `Flag OR ...` / `!Flag OR ...` — kural yalnızca ilgili modda çalışsın
+
+```csharp
+[RuleCriteria("ProductionEntryParameters_RealizedAmount", DefaultContexts.Save, "IsScrapEntry OR RealizedAmount > 0", CustomMessageTemplate = "Üretilen miktar sıfırdan büyük olmalıdır.")]
+[RuleCriteria("ProductionEntryParameters_ScrapAmountPositive", DefaultContexts.Save, "!IsScrapEntry OR ScrapAmount > 0", CustomMessageTemplate = "Fire miktarı sıfırdan büyük olmalıdır.")]
+[RuleCriteria("ProductionEntryParameters_ScrapAmountNotExceedProduced", DefaultContexts.Save, "!IsScrapEntry OR ScrapAmount <= AvailableQuantity", CustomMessageTemplate = "Fire miktarı, mevcut üretim miktarından fazla olamaz.")]
+```
+
+Popup’ta alan gizlemek için aynı criteria diliyle `[Appearance(..., Visibility = ViewItemVisibility.Hide)]` kullan.

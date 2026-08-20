@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <Deterministic>false</Deterministic>
+    <AssemblyVersion>1.0.*</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Configurations>Debug;Release;EasyTest</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\NewFolder\**" />
+    <EmbeddedResource Remove="Controllers\NewFolder\**" />
+    <None Remove="Controllers\NewFolder\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Controllers\ProductionOrderApproveController.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.cs" />
+    <Compile Remove="Controllers\ViewControllerProductiomOrder.Designer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Model.DesignedDiffs.xafml" />
+    <None Remove="Model.DesignedDiffs.Localization.tr-TR.xafml" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Model.DesignedDiffs.xafml" />
+    <!-- WithCulture/LogicalName keep MSBuild from reading the "tr-TR" part of the file name as a
+         culture and moving the model aspect into a satellite assembly. XAF looks the file up as
+         a resource of this assembly. -->
+    <EmbeddedResource Include="Model.DesignedDiffs.Localization.tr-TR.xafml">
+      <WithCulture>false</WithCulture>
+      <LogicalName>MiniMes.Module.Model.DesignedDiffs.Localization.tr-TR.xafml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DevExpress.ExpressApp" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.AuditTrail.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Chart" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.CodeAnalysis" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.ConditionalAppearance" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Objects" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Security" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Security.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Validation" Version="24.1.7" />
+    <PackageReference Include="DevExpress.ExpressApp.Xpo" Version="24.1.7" />
+    <PackageReference Include="DevExpress.Persistent.Base" Version="24.1.7" />
+    <PackageReference Include="DevExpress.Persistent.BaseImpl.Xpo" Version="24.1.7" />
+    <PackageReference Include="Azure.Identity" Version="1.13.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
+  </ItemGroup>
+</Project>

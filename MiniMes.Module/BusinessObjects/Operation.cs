@@ -11,21 +11,35 @@ using System.Collections.Generic;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
+using MiniMes.Module.Services;
 
 namespace MiniMes.Module.BusinessObjects {
     [DefaultClassOptions]
     [NavigationItem("Production Definitions")]
+    [DefaultProperty(nameof(Name))]
     public class Operation : BaseObject { 
+        private const string CodePrefix = "OP";
+
         public Operation(Session session)
             : base(session) {
         }
         public override void AfterConstruction() {
             base.AfterConstruction();
+            IsActive = true;
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+        }
+
+        protected override void OnSaving() {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code)) {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(Operation), CodePrefix);
+            }
         }
 
         private string operationCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return operationCode; }
@@ -40,10 +54,24 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Name), ref operationName, value); }
         }
 
-        [Association("Operation-Routings")]
-        public XPCollection<Routings> Routings
+        private string description;
+        public string Description
         {
-            get { return GetCollection<Routings>(nameof(Routings)); }
+            get { return description; }
+            set { SetPropertyValue(nameof(Description), ref description, value); }
+        }
+
+        private bool isActive;
+        public bool IsActive
+        {
+            get { return isActive; }
+            set { SetPropertyValue(nameof(IsActive), ref isActive, value); }
+        }
+
+        [Association("Operation-Routings")]
+        public XPCollection<RoutingDetail> Routings
+        {
+            get { return GetCollection<RoutingDetail>(nameof(Routings)); }
         }
     }
 }

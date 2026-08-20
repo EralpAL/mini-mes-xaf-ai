@@ -12,24 +12,42 @@ using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.BaseImpl;
 using DevExpress.Persistent.Validation;
 using MiniMes.Module.Enums;
+using MiniMes.Module.Services;
 
-namespace MiniMes.Module.BusinessObjects {
+namespace MiniMes.Module.BusinessObjects
+{
     [DefaultClassOptions]
     [NavigationItem("Stock and Warehouse")]
+    //Rule ekle, save işleminde routing boş olamasın
+    [DefaultProperty(nameof(Name))]
 
+    public class StockCard : BaseObject
+    {
+        private const string CodePrefix = "STK";
 
-    public class StockCard : BaseObject { 
-        
         public StockCard(Session session)
-            : base(session) {
+            : base(session)
+        {
         }
-        public override void AfterConstruction() {
+        public override void AfterConstruction()
+        {
             base.AfterConstruction();
+            Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StockCard), CodePrefix);
+        }
 
-    }
+        protected override void OnSaving()
+        {
+            base.OnSaving();
+            if (string.IsNullOrEmpty(Code))
+            {
+                Code = BusinessCodeGenerator.GenerateCode(Session, typeof(StockCard), CodePrefix);
+            }
+        }
+
         private string stockCode;
         [RuleRequiredField]
         [Indexed(Unique = true)]
+        [ModelDefault("AllowEdit", "False")]
         public string Code
         {
             get { return stockCode; }
@@ -38,16 +56,14 @@ namespace MiniMes.Module.BusinessObjects {
 
         private string stockName;
         [RuleRequiredField]
-        
-
         public String Name
         {
             get { return stockName; }
             set { SetPropertyValue(nameof(Name), ref stockName, value); }
         }
 
-        private StockType stockType;
-        public StockType StockType
+        private EnumStockType stockType;
+        public EnumStockType StockType
         {
             get { return stockType; }
             set { SetPropertyValue(nameof(StockType), ref stockType, value); }
@@ -61,9 +77,15 @@ namespace MiniMes.Module.BusinessObjects {
             set { SetPropertyValue(nameof(Warehouse), ref warehouse, value); }
         }
         [Association("StockCard-Routings")]
-        public XPCollection<Routings> Routings
+        public XPCollection<RoutingDetail> Routings
         {
-            get { return GetCollection<Routings>(nameof(Routings)); }
+            get { return GetCollection<RoutingDetail>(nameof(Routings)); }
+        }
+
+        [Association("StockCard-RoutingHeaders")]
+        public XPCollection<Routings> RoutingHeaders
+        {
+            get { return GetCollection<Routings>(nameof(RoutingHeaders)); }
         }
 
         [Association("StockCard-ProductionOrders")]

@@ -1,0 +1,151 @@
+@inject MiniMes.Blazor.Server.Services.MesAiChatPanelState ChatState
+@inject MiniMes.AI.Interfaces.IMesAiAssistantService AssistantService
+@inject MiniMes.Module.Services.XafAiAnalysisLogService AnalysisLogService
+@implements IDisposable
+
+@if (ChatState.IsAvailable)
+{
+    @if (ChatState.IsExpanded)
+    {
+        <div class="mes-ai-chat-panel">
+            <div class="mes-ai-chat-header">
+                <div>
+                    <div class="mes-ai-chat-title">MES AI Asistan</div>
+                    <div class="mes-ai-chat-subtitle">Mini-MES hakkında sorularınızı yazın</div>
+                </div>
+                <button type="button" class="mes-ai-chat-icon-button" @onclick="Collapse">−</button>
+            </div>
+            <div class="mes-ai-chat-messages">
+                @if (ChatState.Messages.Count == 0)
+                {
+                    <div class="mes-ai-chat-hint">Üretim, stok, depo, iş emirleri, personel, vardiya, bakım ve duruş kayıtları hakkında soru sorabilirsiniz.</div>
+                }
+                @foreach (var line in ChatState.Messages)
+                {
+                    <div class="@(line.IsUser ? "mes-ai-chat-bubble mes-ai-chat-bubble-user" : "mes-ai-chat-bubble mes-ai-chat-bubble-assistant")">
+                        @line.Text
+                    </div>
+                }
+                @if (ChatState.IsBusy)
+                {
+                    <div class="mes-ai-chat-hint">Yanıt hazırlanıyor...</div>
+                }
+            </div>
+            <div class="mes-ai-chat-input-row">
+                <input class="mes-ai-chat-input"
+                       disabled="@ChatState.IsBusy"
+                       placeholder="MES hakkında sorunuzu yazın"
+                       @bind="ChatState.Draft"
+                       @bind:event="oninput"
+                       @onkeydown="OnKeyDown" />
+                <button type="button" class="mes-ai-chat-send" disabled="@ChatState.IsBusy" @onclick="SendAsync">Gönder</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <button type="button" class="mes-ai-chat-launcher" @onclick="Expand">AI</button>
+    }
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        ChatState.Changed += OnChatStateChanged;
+    }
+
+    public void Dispose()
+    {
+        ChatState.Changed -= OnChatStateChanged;
+    }
+
+    private void OnChatStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void Collapse()
+    {
+        ChatState.Collapse();
+    }
+
+    private void Expand()
+    {
+        ChatState.Expand();
+    }
+
+    private async Task OnKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SendAsync();
+        }
+    }
+
+    private async Task SendAsync()
+    {
+        string question = ChatState.Draft;
+
+        if (ChatState.IsBusy || string.IsNullOrWhiteSpace(question))
+        {
+            return;
+        }
+
+        ChatState.Draft = string.Empty;
+        ChatState.AddMessage(true, question);
+        ChatState.IsBusy = true;
+        ChatState.RaiseChanged();
+
+        try
+        {
+            MiniMes.AI.Models.AssistantRequest request = new MiniMes.AI.Models.AssistantRequest();
+            request.Message = question;
+            request.ProductionOrderCode = ChatState.CurrentProductionOrderCode;
+
+            MiniMes.AI.Models.AssistantResponse response = await AssistantService.SendAsync(request);
+
+            if (response.IsSuccessful)
+            {
+                ChatState.AddMessage(false, response.Message);
+                AnalysisLogService.Save(question, response);
+            }
+            else
+            {
+                string errorText = response.ErrorMessage;
+
+                if (string.IsNullOrWhiteSpace(errorText))
+                {
+                    errorText = "Yanıt alınamadı.";
+                }
+
+                ChatState.AddMessage(false, errorText);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception exception)
+        {
+            string environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            if (string.Equals(environmentName, "Development", StringComparison.OrdinalIgnoreCase))
+            {
+                System.Diagnostics.Debug.WriteLine(exception.ToString());
+                Console.WriteLine(exception.ToString());
+            }
+
+            string errorText = exception.Message;
+            if (exception.InnerException != null && !string.IsNullOrWhiteSpace(exception.InnerException.Message))
+            {
+                errorText = errorText + " | " + exception.InnerException.Message;
+            }
+
+            ChatState.AddMessage(false, "Yapay zeka servisi yanıt veremedi: " + errorText);
+        }
+        finally
+        {
+            ChatState.IsBusy = false;
+            ChatState.RaiseChanged();
+        }
+    }
+}
