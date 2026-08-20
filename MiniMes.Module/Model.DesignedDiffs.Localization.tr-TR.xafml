@@ -171,6 +171,7 @@
       <Item Id="Production Definitions" Caption="Üretim Tanımları" />
       <Item Id="Personnel and Shifts" Caption="Personel ve Vardiyalar" />
       <Item Id="Production Operations" Caption="Üretim İşlemleri" />
+      <Item Id="AI Sorgu Geçmişi" Caption="AI Sorgu Geçmişi" />
     </Items>
   </NavigationItems>
   <ActionDesign>

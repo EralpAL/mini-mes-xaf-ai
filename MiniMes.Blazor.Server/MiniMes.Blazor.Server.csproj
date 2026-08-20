@@ -28,5 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MiniMes.Module\MiniMes.Module.csproj" />
+    <ProjectReference Include="..\MiniMes.AI\MiniMes.AI.csproj" />
   </ItemGroup>
 </Project>

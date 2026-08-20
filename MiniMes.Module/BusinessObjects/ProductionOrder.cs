@@ -261,7 +261,10 @@ namespace MiniMes.Module.BusinessObjects
         }
 
         [Association("ProductionOrder-AiAnalysisRecords")]
-        [XafDisplayName("AI Analiz Geçmişi")]
+        [XafDisplayName("AI Sorgu Geçmişi")]
+        [VisibleInDetailView(false)]
+        [VisibleInListView(false)]
+        [VisibleInLookupListView(false)]
         public XPCollection<AiAnalysisRecord> AiAnalysisRecords
         {
             get

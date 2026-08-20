@@ -8,36 +8,41 @@
   </Options>
   <Views>
     <ListView Id="ApplicationUser_ListView" Caption="Users" />
-    <DetailView Id="AiAnalysisRecord_DetailView" Caption="AI Gecikme Analizi" AllowEdit="False">
+    <DetailView Id="AiAnalysisRecord_DetailView" Caption="AI Sorgusu" AllowEdit="False" AllowNew="False" AllowDelete="False">
       <Items>
-        <PropertyEditor Id="AnalysisDate" Index="0" />
+        <PropertyEditor Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
         <PropertyEditor Id="ModelName" Index="1" Caption="Kullanılan Model" />
-        <PropertyEditor Id="AnalysisText" Index="2" RowCount="9" Caption="Gecikme Analizi" />
-        <PropertyEditor Id="OptimizationRecommendation" Index="3" RowCount="9" Caption="Optimizasyon Önerisi" />
+        <PropertyEditor Id="UserQuestion" Index="2" RowCount="4" Caption="Kullanıcı Sorusu" />
+        <PropertyEditor Id="AnalysisText" Index="3" RowCount="9" Caption="AI Yanıtı" />
+        <PropertyEditor Id="OptimizationRecommendation" Index="-1" Removed="True" />
         <PropertyEditor Id="ProductionOrder" Index="-1" Removed="True" />
       </Items>
       <Layout>
         <LayoutGroup Id="Main" Direction="Vertical" ShowCaption="False">
           <LayoutItem Id="AnalysisDate" ViewItem="AnalysisDate" Index="0" />
           <LayoutItem Id="ModelName" ViewItem="ModelName" Index="1" />
-          <LayoutItem Id="AnalysisText" ViewItem="AnalysisText" Index="2" RelativeSize="100" />
-          <LayoutItem Id="OptimizationRecommendation" ViewItem="OptimizationRecommendation" Index="3" RelativeSize="100" />
+          <LayoutItem Id="UserQuestion" ViewItem="UserQuestion" Index="2" RelativeSize="40" />
+          <LayoutItem Id="AnalysisText" ViewItem="AnalysisText" Index="3" RelativeSize="60" />
         </LayoutGroup>
       </Layout>
     </DetailView>
-    <ListView Id="AiAnalysisRecord_ListView" Caption="AI Analiz Kayıtları" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
+    <ListView Id="AiAnalysisRecord_ListView" Caption="AI Sorgu Geçmişi" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
       <Columns>
-        <ColumnInfo Id="AnalysisDate" Index="0" />
-        <ColumnInfo Id="ProductionOrder" Index="1" />
-        <ColumnInfo Id="ModelName" Index="2" Caption="Kullanılan Model" />
+        <ColumnInfo Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
+        <ColumnInfo Id="ModelName" Index="1" Caption="Kullanılan Model" />
+        <ColumnInfo Id="UserQuestion" Index="2" Caption="Kullanıcı Sorusu" />
+        <ColumnInfo Id="AnalysisText" Index="3" Caption="AI Yanıtı" />
+        <ColumnInfo Id="ProductionOrder" Index="-1" Removed="True" />
+        <ColumnInfo Id="OptimizationRecommendation" Index="-1" Removed="True" />
       </Columns>
     </ListView>
-    <ListView Id="ProductionOrder_AiAnalysisRecords_ListView" Caption="AI Analiz Geçmişi" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
+    <ListView Id="ProductionOrder_AiAnalysisRecords_ListView" Caption="AI Sorgu Geçmişi" AllowNew="False" AllowDelete="False" AllowEdit="False" AllowLink="False" AllowUnlink="False">
       <Columns>
-        <ColumnInfo Id="AnalysisDate" Index="0" />
+        <ColumnInfo Id="AnalysisDate" Index="0" Caption="Sorgu Tarihi" />
         <ColumnInfo Id="ModelName" Index="1" Caption="Kullanılan Model" />
+        <ColumnInfo Id="UserQuestion" Index="2" Caption="Kullanıcı Sorusu" />
+        <ColumnInfo Id="AnalysisText" Index="3" Caption="AI Yanıtı" />
         <ColumnInfo Id="ProductionOrder" Index="-1" Removed="True" />
-        <ColumnInfo Id="AnalysisText" Index="-1" Removed="True" />
         <ColumnInfo Id="OptimizationRecommendation" Index="-1" Removed="True" />
       </Columns>
     </ListView>

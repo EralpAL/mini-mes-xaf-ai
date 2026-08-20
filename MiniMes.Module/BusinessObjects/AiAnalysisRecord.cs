@@ -4,7 +4,6 @@ using DevExpress.ExpressApp.Editors;
 using DevExpress.ExpressApp.Model;
 using DevExpress.Persistent.Base;
 using DevExpress.Persistent.BaseImpl;
-using DevExpress.Persistent.Validation;
 using DevExpress.Xpo;
 using System;
 using System.ComponentModel;
@@ -12,14 +11,14 @@ using System.ComponentModel;
 namespace MiniMes.Module.BusinessObjects
 {
     [DefaultClassOptions]
-    [NavigationItem("AI Analizi")]
+    [NavigationItem("AI Sorgu Geçmişi")]
     [CreatableItem(false)]
     [DefaultProperty(nameof(AnalysisDate))]
-    [XafDisplayName("AI Analiz Kayıtları")]
+    [XafDisplayName("AI Sorgu Geçmişi")]
     [ModelDefault("AllowEdit", "False")]
     [ModelDefault("AllowNew", "False")]
     [ModelDefault("AllowDelete", "False")]
-    [ModelDefault("Caption", "AI Gecikme Analizi")]
+    [ModelDefault("Caption", "AI Sorgu Geçmişi")]
     [Appearance("AiAnalysisRecord_HideNew", AppearanceItemType.Action, "1=1", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
     [Appearance("AiAnalysisRecord_HideDelete", AppearanceItemType.Action, "1=1", TargetItems = "Delete", Visibility = ViewItemVisibility.Hide)]
     [Appearance("AiAnalysisRecord_HideLinkUnlink", AppearanceItemType.Action, "1=1", TargetItems = "Link;Unlink", Visibility = ViewItemVisibility.Hide)]
@@ -38,10 +37,10 @@ namespace MiniMes.Module.BusinessObjects
 
         private ProductionOrder productionOrder;
 
-        [RuleRequiredField]
         [Association("ProductionOrder-AiAnalysisRecords")]
-        [XafDisplayName("Üretim Emri")]
         [VisibleInDetailView(false)]
+        [VisibleInListView(false)]
+        [VisibleInLookupListView(false)]
         public ProductionOrder ProductionOrder
         {
             get
@@ -58,7 +57,7 @@ namespace MiniMes.Module.BusinessObjects
 
         [Index(0)]
         [ModelDefault("AllowEdit", "False")]
-        [XafDisplayName("Analiz Tarihi")]
+        [XafDisplayName("Sorgu Tarihi")]
         public DateTime AnalysisDate
         {
             get
@@ -88,15 +87,32 @@ namespace MiniMes.Module.BusinessObjects
             }
         }
 
-        private string analysisText;
+        private string userQuestion;
 
         [Index(2)]
         [Size(SizeAttribute.Unlimited)]
         [ModelDefault("AllowEdit", "False")]
+        [ModelDefault("RowCount", "4")]
+        [XafDisplayName("Kullanıcı Sorusu")]
+        public string UserQuestion
+        {
+            get
+            {
+                return userQuestion;
+            }
+            set
+            {
+                SetPropertyValue(nameof(UserQuestion), ref userQuestion, value);
+            }
+        }
+
+        private string analysisText;
+
+        [Index(3)]
+        [Size(SizeAttribute.Unlimited)]
+        [ModelDefault("AllowEdit", "False")]
         [ModelDefault("RowCount", "9")]
-        [XafDisplayName("Gecikme Analizi")]
-        [VisibleInListView(false)]
-        [VisibleInLookupListView(false)]
+        [XafDisplayName("AI Yanıtı")]
         public string AnalysisText
         {
             get
@@ -111,11 +127,8 @@ namespace MiniMes.Module.BusinessObjects
 
         private string optimizationRecommendation;
 
-        [Index(3)]
         [Size(SizeAttribute.Unlimited)]
-        [ModelDefault("AllowEdit", "False")]
-        [ModelDefault("RowCount", "9")]
-        [XafDisplayName("Optimizasyon Önerisi")]
+        [VisibleInDetailView(false)]
         [VisibleInListView(false)]
         [VisibleInLookupListView(false)]
         public string OptimizationRecommendation

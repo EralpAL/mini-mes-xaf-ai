@@ -3,6 +3,7 @@ using DevExpress.ExpressApp.Actions;
 using DevExpress.ExpressApp.Blazor;
 using DevExpress.ExpressApp.Blazor.Services;
 using DevExpress.Persistent.Base;
+using MiniMes.Module.BusinessObjects;
 using System.Globalization;
 
 namespace MiniMes.Blazor.Server.Controllers;
@@ -23,6 +24,34 @@ public class ChangeLanguageController : ViewController
         changeLanguageAction.Caption = "Türkçe / English";
         changeLanguageAction.ToolTip = "Switch the application language between Turkish and English.";
         changeLanguageAction.Execute += ChangeLanguageAction_Execute;
+    }
+
+    protected override void OnActivated()
+    {
+        base.OnActivated();
+        UpdateChangeLanguageVisibility();
+    }
+
+    protected override void OnViewControlsCreated()
+    {
+        base.OnViewControlsCreated();
+        UpdateChangeLanguageVisibility();
+    }
+
+    protected override void OnDeactivated()
+    {
+        changeLanguageAction.Active.RemoveItem("HideOnSelectedViews");
+        base.OnDeactivated();
+    }
+
+    private void UpdateChangeLanguageVisibility()
+    {
+        bool hideLanguageAction = View != null &&
+            View.ObjectTypeInfo != null &&
+            (typeof(ProductionOrder).IsAssignableFrom(View.ObjectTypeInfo.Type) ||
+             typeof(AiAnalysisRecord).IsAssignableFrom(View.ObjectTypeInfo.Type));
+
+        changeLanguageAction.Active["HideOnSelectedViews"] = !hideLanguageAction;
     }
 
     private async void ChangeLanguageAction_Execute(object sender, SimpleActionExecuteEventArgs e)

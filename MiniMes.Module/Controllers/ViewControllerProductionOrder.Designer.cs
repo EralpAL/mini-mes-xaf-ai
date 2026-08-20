@@ -33,7 +33,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.ProductionOrder_Approve =new DevExpress.ExpressApp.Actions.SimpleAction(this.components);
-            this.ProductionOrder_AiDelayAnalysis =new DevExpress.ExpressApp.Actions.SimpleAction(this.components);
             //
             // ProductionOrder_Approve
             //
@@ -44,31 +43,16 @@
             this.ProductionOrder_Approve.ImageName = "Apply_16x16";
             this.ProductionOrder_Approve.TargetObjectType =typeof(MiniMes.Module.BusinessObjects.ProductionOrder);
             this.ProductionOrder_Approve.ToolTip ="Generate Work Orders from the routing and start the Production Order.";
-            this.ProductionOrder_Approve.SelectionDependencyType =DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
-            this.ProductionOrder_Approve.TargetObjectsCriteria ="Status = 'Planned'";
+            this.ProductionOrder_Approve.SelectionDependencyType = DevExpress.ExpressApp.Actions.SelectionDependencyType.Independent;
             this.ProductionOrder_Approve.Execute +=new DevExpress.ExpressApp.Actions.SimpleActionExecuteEventHandler(this.ProductionOrder_Approve_Execute);
-            //
-            // ProductionOrder_AiDelayAnalysis
-            //
-            this.ProductionOrder_AiDelayAnalysis.Caption = "AI ile Gecikme Analizi ";
-            this.ProductionOrder_AiDelayAnalysis.Category = "View";
-            this.ProductionOrder_AiDelayAnalysis.Id = "ProductionOrder.AiDelayAnalysis";
-            this.ProductionOrder_AiDelayAnalysis.ImageName = "Action_Search";
-            this.ProductionOrder_AiDelayAnalysis.TargetObjectType =typeof(MiniMes.Module.BusinessObjects.ProductionOrder);
-            this.ProductionOrder_AiDelayAnalysis.TargetViewType = DevExpress.ExpressApp.ViewType.DetailView;
-            this.ProductionOrder_AiDelayAnalysis.SelectionDependencyType =DevExpress.ExpressApp.Actions.SelectionDependencyType.RequireSingleObject;
-            this.ProductionOrder_AiDelayAnalysis.ToolTip ="Üretim emrini yapay zekâ ile analiz eder.";
-            this.ProductionOrder_AiDelayAnalysis.Execute +=new DevExpress.ExpressApp.Actions.SimpleActionExecuteEventHandler(this.ProductionOrder_AiDelayAnalysis_Execute);
             //
             // ViewControllerProductionOrder
             //
             this.Actions.Add(this.ProductionOrder_Approve);
-            this.Actions.Add(this.ProductionOrder_AiDelayAnalysis);
         }
 
         #endregion
 
         private DevExpress.ExpressApp.Actions.SimpleAction ProductionOrder_Approve;
-        private DevExpress.ExpressApp.Actions.SimpleAction ProductionOrder_AiDelayAnalysis;
     }
 }

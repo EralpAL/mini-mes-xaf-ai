@@ -14,6 +14,9 @@ using System.Globalization;
 // Ai integration
 using DevExpress.AIIntegration;
 using Microsoft.Extensions.AI;
+using MiniMes.AI.Interfaces;
+using MiniMes.AI.Services;
+using MiniMes.Module.Services;
 using OllamaSharp;
 
 namespace MiniMes.Blazor.Server;
@@ -35,10 +38,17 @@ public class Startup {
         services.AddHttpContextAccessor();
 
         // Ai integration
-        IChatClient chatClient = new OllamaApiClient(new Uri("http://localhost:11434"), "gemma3:1b");
+        OllamaApiClient ollamaApiClient = new OllamaApiClient(new Uri("http://localhost:11434"), "qwen3:1.7b");
 
-        services.AddChatClient(chatClient);
+        services
+            .AddChatClient(ollamaApiClient)
+            .UseFunctionInvocation();
         services.AddDevExpressAI();
+
+        services.AddScoped<IProductionOrderTool, XafProductionOrderTool>();
+        services.AddScoped<IMesAiAssistantService, MesAiAssistantService>();
+        services.AddScoped<XafAiAnalysisLogService>();
+        services.AddScoped<MesAiChatPanelState>();
 
 
         services.AddScoped<CircuitHandler, CircuitHandlerProxy>();
