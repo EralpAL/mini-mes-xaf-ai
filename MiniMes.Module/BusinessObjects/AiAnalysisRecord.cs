@@ -19,6 +19,7 @@ namespace MiniMes.Module.BusinessObjects
     [ModelDefault("AllowNew", "False")]
     [ModelDefault("AllowDelete", "False")]
     [ModelDefault("Caption", "AI Sorgu Geçmişi")]
+
     [Appearance("AiAnalysisRecord_HideNew", AppearanceItemType.Action, "1=1", TargetItems = "New", Visibility = ViewItemVisibility.Hide)]
     [Appearance("AiAnalysisRecord_HideDelete", AppearanceItemType.Action, "1=1", TargetItems = "Delete", Visibility = ViewItemVisibility.Hide)]
     [Appearance("AiAnalysisRecord_HideLinkUnlink", AppearanceItemType.Action, "1=1", TargetItems = "Link;Unlink", Visibility = ViewItemVisibility.Hide)]

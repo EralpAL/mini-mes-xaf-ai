@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.Blazor.Server", "Mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.AI", "MiniMes.AI\MiniMes.AI.csproj", "{12DAC428-6AF3-4B23-9C25-D0A613935D19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MiniMes.AI.TestConsole", "MiniMes.AI.TestConsole\MiniMes.AI.TestConsole.csproj", "{54FD897B-CCF3-4E13-B6C5-345994656E05}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,12 +42,6 @@ Global
 		{12DAC428-6AF3-4B23-9C25-D0A613935D19}.EasyTest|Any CPU.Build.0 = Release|Any CPU
 		{12DAC428-6AF3-4B23-9C25-D0A613935D19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12DAC428-6AF3-4B23-9C25-D0A613935D19}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.EasyTest|Any CPU.ActiveCfg = Release|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.EasyTest|Any CPU.Build.0 = Release|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54FD897B-CCF3-4E13-B6C5-345994656E05}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

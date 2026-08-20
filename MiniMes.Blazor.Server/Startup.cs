@@ -46,6 +46,7 @@ public class Startup {
         services.AddDevExpressAI();
 
         services.AddScoped<IProductionOrderTool, XafProductionOrderTool>();
+        services.AddScoped<IMesDataTool, XafMesDataTool>();
         services.AddScoped<IMesAiAssistantService, MesAiAssistantService>();
         services.AddScoped<XafAiAnalysisLogService>();
         services.AddScoped<MesAiChatPanelState>();

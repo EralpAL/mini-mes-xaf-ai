@@ -20,6 +20,8 @@ namespace MiniMes.Blazor.Server.Services
 
         public string Draft { get; set; }
 
+        public string CurrentProductionOrderCode { get; set; }
+
         public List<MesAiChatLine> Messages { get; }
 
         public event Action Changed;
@@ -28,6 +30,7 @@ namespace MiniMes.Blazor.Server.Services
         {
             Messages = new List<MesAiChatLine>();
             Draft = string.Empty;
+            CurrentProductionOrderCode = string.Empty;
         }
 
         public void Show()

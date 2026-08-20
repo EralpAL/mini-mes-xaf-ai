@@ -4,6 +4,7 @@ namespace MiniMes.AI.Models
     {
         private string message = string.Empty;
         private string? conversationId;
+        private string? productionOrderCode;
 
         public string Message
         {
@@ -17,7 +18,7 @@ namespace MiniMes.AI.Models
             }
         }
 
-        // boþ null olabilir
+        
         public string? ConversationId
         {
             get
@@ -27,6 +28,18 @@ namespace MiniMes.AI.Models
             set
             {
                 conversationId = value;
+            }
+        }
+
+        public string? ProductionOrderCode
+        {
+            get
+            {
+                return productionOrderCode;
+            }
+            set
+            {
+                productionOrderCode = value;
             }
         }
     }

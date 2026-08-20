@@ -24,6 +24,7 @@ namespace MiniMes.AI.Tools
                 productionOrder.PlannedQuantity = 100;
                 productionOrder.ProducedQuantity = 80;
                 productionOrder.Status = "InProgress";
+                productionOrder.RecalculateAnalysisMetrics();
                 return Task.FromResult<ProductionOrderDto?>(productionOrder);
             }
 

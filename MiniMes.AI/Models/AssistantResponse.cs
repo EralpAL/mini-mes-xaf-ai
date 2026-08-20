@@ -6,6 +6,8 @@ namespace MiniMes.AI.Models
         private bool isSuccessful;
         private string? usedToolName;
         private string? errorMessage;
+        private ProductionOrderReportDto? report;
+        private WorkOrderReportDto? workOrderReport;
 
         public string Message
         {
@@ -52,6 +54,30 @@ namespace MiniMes.AI.Models
             set
             {
                 errorMessage = value;
+            }
+        }
+
+        public ProductionOrderReportDto? Report
+        {
+            get
+            {
+                return report;
+            }
+            set
+            {
+                report = value;
+            }
+        }
+
+        public WorkOrderReportDto? WorkOrderReport
+        {
+            get
+            {
+                return workOrderReport;
+            }
+            set
+            {
+                workOrderReport = value;
             }
         }
     }
